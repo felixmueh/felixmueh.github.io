@@ -1,0 +1,150 @@
+<!doctype html>
+<!--
+  Home page (layout "variant A", chosen 24.11.2026): compact header with photo, bio
+  and links; project rows with looping clips as the main content; a short timeline
+  at the bottom. Facts come from the Bewerbung repo (docs/profile.md, docs/cv-pool/,
+  docs/projects.md, cv/data/cv.yaml). Placeholders: class "todo" plus a TODO(felix)
+  comment; list them with tools/check_todos.sh.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Felix Mühlenberend</title>
+<meta name="description" content="Felix Mühlenberend, computer scientist (M.Sc. KIT): GPU model predictive control on a real robot arm, programming languages, real-time graphics.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav" aria-label="Main">
+  <div class="column">
+    <a class="brand" href="index.html">Felix Mühlenberend</a>
+    <ul>
+      <li><a href="index.html" aria-current="page">Home</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="cv.html">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="column">
+  <!-- ==========================================================================
+       Header: name and links, bio, photo. On a phone the photo shrinks to 96 px
+       beside the name so the first project row is on the first screen.
+       ========================================================================== -->
+  <header class="home-header">
+    <!-- TODO(felix): photo (round crop, self-hosted, a few dozen KB) -->
+    <div class="photo ph-photo todo" role="img" aria-label="Photo placeholder">photo</div>
+    <div class="name">
+      <h1>Felix Mühlenberend</h1>
+      <p class="links">
+        <!-- TODO(felix): e-mail alias on the domain once it is registered -->
+        <a class="todo" href="mailto:mail@felix-muehlenberend.de">Email</a>
+        <a href="cv.html">CV</a>
+        <a href="https://github.com/felixmueh">GitHub</a>
+        <!-- TODO(felix): LinkedIn URL -->
+        <a href="#" class="todo">LinkedIn</a>
+      </p>
+    </div>
+    <div class="bio">
+      <p>I'm a computer scientist in Karlsruhe. I studied at <a href="https://www.kit.edu/">KIT</a> (B.Sc. and M.Sc. Informatik) with a focus on algorithms and artificial intelligence, and spent an Erasmus+ year at <a href="https://www.upc.edu/">UPC Barcelona</a>. For my master's thesis I ran GPU-accelerated model predictive control on the embedded computer of a real <a href="projects/tiago-mpc.html">robot arm</a>.</p>
+      <!-- TODO(felix): start date for the full-time position -->
+      <p>I'm looking for a full-time position <span class="todo">[from: start date?]</span>.</p>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Projects: newest first, the thesis highlighted. Each row shows a clip and
+       two sentences without a click (docs/guides/personal-website-demos.md §1.2).
+       ========================================================================== -->
+  <h2 id="projects">Projects</h2>
+  <p class="home-intro">Selected work, newest first. Each clip is silent and loops; the project page has the details.</p>
+
+  <div class="rows">
+    <article class="row key">
+      <!-- TODO(felix): clip, TIAGo Pro arm under MPC (lab permission for robot footage; TIAGo mesh licence) -->
+      <div class="ph clip todo">TIAGo Pro right arm, MPC reaching on the Jetson<br>6 s loop</div>
+      <div>
+        <h3><a href="projects/tiago-mpc.html">GPU-accelerated MPC on a real robot arm</a></h3>
+        <div class="meta">Master's thesis, KIT · CUDA/C++, Python, ROS 2, Jetson AGX Orin · 2026</div>
+        <div class="links">
+          <a href="projects/tiago-mpc.html">project page</a>
+          <!-- TODO(felix): thesis PDF link (publish it?) -->
+          <a href="#" class="todo">thesis PDF</a>
+          <a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">merged GATO PRs</a>
+        </div>
+        <p>I ported the GPU trajectory optimizer GATO to the right arm of a TIAGo Pro and ran it as a model predictive controller on the robot's embedded NVIDIA Jetson AGX Orin, in simulation and on the physical arm. Solve times allow about 150 control updates per second, and three fixes I found along the way were merged into GATO.</p>
+      </div>
+    </article>
+
+    <article class="row">
+      <!-- TODO(felix): clip, dice-web: typing a dice expression, chart updates -->
+      <div class="ph clip todo">dice-web: typing a dice expression, chart updates<br>5 s loop</div>
+      <div>
+        <h3><a href="https://felixmueh.github.io/dice-web/">dice: a language for exact dice probabilities</a></h3>
+        <div class="meta">Solo · Python, JavaScript, Pyodide · 2020–2026</div>
+        <div class="links"><a href="https://felixmueh.github.io/dice-web/">live demo (≈ 6 MB)</a><a href="https://github.com/felixmueh/dice">code</a></div>
+        <p>A small programming language with its own lexer, recursive-descent parser, interpreter and exact distribution engine, written by hand in 2020 and reworked in 2026 with AI coding agents. dice-web runs it entirely in the browser via Pyodide, with an editor, charts and shareable links.</p>
+      </div>
+    </article>
+
+    <article class="row">
+      <!-- TODO(felix): clip, ReSTIR: many area lights, temporal reuse off → on -->
+      <div class="ph clip todo">ReSTIR: many area lights, temporal reuse off → on<br>6 s loop</div>
+      <div>
+        <h3>ReSTIR real-time lighting</h3>
+        <div class="meta">Course project, team of 2 · C++, OpenGL, GLSL · 2024–2025</div>
+        <!-- TODO(felix): publish the code (glf licence, teammate consent) or drop this line -->
+        <div class="links"><span class="todo">code not public yet</span></div>
+        <p>The method of Bitterli et al. (2020) for direct lighting from many area lights, built for KIT's practical course Real-Time Computer Graphics. My share was the sampling and reservoir pipeline: RIS, streaming RIS, temporal reuse and alias-table light sampling in GLSL compute shaders.</p>
+      </div>
+    </article>
+
+    <article class="row">
+      <!-- TODO(felix): still image, Java method in → generated JML "determines" contract out -->
+      <div class="ph todo">still: Java method in → generated JML “determines” contract out</div>
+      <div>
+        <h3><a href="https://github.com/felixmueh/sflow-key-translation-layer">Type system meets theorem prover</a></h3>
+        <div class="meta">Bachelor's thesis, KIT · Java, Checker Framework, KeY · 2023</div>
+        <div class="links">
+          <a href="https://github.com/felixmueh/sflow-key-translation-layer">code</a>
+          <!-- TODO(felix): bachelor's thesis PDF link (publish it?) -->
+          <a href="#" class="todo">thesis PDF</a>
+        </div>
+        <p>Information-flow control for Java: the type checker SFlow checks most methods automatically and generates JML contracts for the theorem prover KeY where it fails. I extended the type system with rules for implicit flows and method types and proved the combined system sound.</p>
+      </div>
+    </article>
+
+    <article class="row">
+      <!-- TODO(felix): clip, Mannys World Theory: a corpse used to solve a level (team consent, third-party assets) -->
+      <div class="ph clip todo">Mannys World Theory: a corpse used to solve a level<br>6 s loop</div>
+      <div>
+        <h3>Mannys World Theory</h3>
+        <div class="meta">Team project, lead developer · Unity, C# · 2019</div>
+        <!-- TODO(felix): public build or not (third-party assets); drop this line if not -->
+        <div class="links"><span class="todo">no public build</span></div>
+        <p>A 2D physics puzzle game in which the player character's corpses become tools for solving the levels. As lead developer I wrote about 98% of the code: character controller, physics and teleporter mechanics, with pull requests and issues in Git.</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- ==========================================================================
+       Short timeline
+       ========================================================================== -->
+  <h2>Timeline</h2>
+  <ul class="mini-timeline">
+    <li><span class="when">2023 – 2026</span><span>M.Sc. Informatik, KIT. Thesis on embedded GPU model predictive control (IAR, Prof. Katja Mombaur)</span></li>
+    <li><span class="when">2023 – 2024</span><span>Erasmus+ exchange year, UPC Barcelona (Master in Innovation and Research in Informatics)</span></li>
+    <li><span class="when">2021 – 2023</span><span>Working student, Mercedes-Benz AG, e-motor series development: Python framework that automates finite element simulations</span></li>
+    <li><span class="when">2020 – 2023</span><span>B.Sc. Informatik, KIT. Thesis on information-flow verification</span></li>
+    <li><span class="when">2016 – 2020</span><span>Aerospace engineering, University of Stuttgart; switched to computer science</span></li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="column">© 2026 Felix Mühlenberend · <a href="legal.html">Impressum / Datenschutz</a> · no cookies, no trackers, no external requests</div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

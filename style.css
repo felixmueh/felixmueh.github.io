@@ -1,0 +1,214 @@
+/* ==============================================================================
+   felix-muehlenberend.de: one stylesheet for every page.
+
+   Look borrowed from jonbarron.info (narrow column, project rows with a small
+   clip on the left), written from scratch. System fonts only: the site makes no
+   external requests (no web fonts, no CDN, no analytics), see README.md.
+   ============================================================================== */
+
+:root {
+  --text: #1a1a1a;
+  --muted: #5f6368;          /* 6.3:1 on white: passes WCAG AA for body text */
+  --link: #1a5fb4;
+  --rule: #e3e3e3;
+  --ph-bg: #d9d9d9;
+  --ph-text: #3c3c3c;
+  --highlight: #fffbe0;      /* Barron's yellow "key work" row, toned down */
+  --todo-bg: #ffe6e6;
+  --todo-text: #8a1111;
+  --column: 820px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--text);
+  font: 16px/1.55 var(--font);
+}
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+h1, h2, h3 { line-height: 1.2; font-weight: 600; }
+h2 { font-size: 1.35rem; margin: 2.2rem 0 0.8rem; }
+h3 { font-size: 1.05rem; margin: 0 0 0.25rem; }
+p { margin: 0 0 0.8rem; }
+code { font-family: var(--mono); font-size: 0.9em; }
+
+.column { max-width: var(--column); margin: 0 auto; padding: 0 16px; }
+
+/* ------------------------------------------------------------------------------
+   Top nav, shared by every page
+   ------------------------------------------------------------------------------ */
+.topnav { border-bottom: 1px solid var(--rule); }
+.topnav .column { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 56px; }
+.topnav .brand { color: var(--text); font-weight: 600; white-space: nowrap; }
+.topnav ul { display: flex; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+.topnav a[aria-current="page"] { color: var(--text); font-weight: 600; }
+
+/* ------------------------------------------------------------------------------
+   Placeholders (TODO(felix)): every one carries the class .todo and a
+   TODO(felix) comment, so tools/check_todos.sh finds it and the red marking
+   makes it obvious on screen. Remove both when the real content goes in.
+   ------------------------------------------------------------------------------ */
+.todo { background: var(--todo-bg); color: var(--todo-text); padding: 0 0.25em; border-radius: 2px; font-size: 0.9em; }
+/* Block placeholders keep their own look (declared further down, so it wins
+   over .todo) and only get a red dashed outline. */
+.ph.todo, .ph-photo.todo, .ph-box.todo { outline: 2px dashed var(--todo-text); outline-offset: -2px; }
+
+/* ------------------------------------------------------------------------------
+   Clips: silent looping videos (for now grey 16:9 stand-ins)
+   ------------------------------------------------------------------------------ */
+.ph, .clip {
+  position: relative;
+  aspect-ratio: 16 / 9;          /* reserves space: no layout shift (CLS) */
+  overflow: hidden;
+}
+.clip video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ph {
+  background: var(--ph-bg);
+  color: var(--ph-text);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-size: 0.72rem; line-height: 1.3;
+  padding: 0.5rem;
+}
+/* A moving sweep on the stand-ins, so the pause control and the reduced-motion
+   rule have something to stop until real clips exist. */
+.ph.clip::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: translateX(-100%);
+  animation: sweep 3s linear infinite;
+}
+.ph.clip.paused::after { animation-play-state: paused; }
+@keyframes sweep { to { transform: translateX(100%); } }
+
+/* WCAG 2.2.2: a looping clip longer than 5 s needs a pause control (site.js). */
+.clip .pause {
+  position: absolute; right: 4px; bottom: 4px; z-index: 1;
+  font: 600 0.7rem var(--font);
+  background: rgba(0,0,0,.7); color: #fff;
+  border: 0; border-radius: 3px; padding: 2px 6px; cursor: pointer;
+}
+.clip .pause:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+/* Without JS, nothing moves under reduced motion. With JS, site.js starts
+   clips paused under reduced motion, and the visitor can still press Play. */
+@media (prefers-reduced-motion: reduce) {
+  .ph.clip:not([data-js])::after { animation: none; }
+}
+
+.ph-photo {
+  border-radius: 50%;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ph-bg); color: var(--ph-text);
+  text-align: center; font-size: 0.8rem;
+  overflow: hidden;
+}
+.ph-photo img { width: 100%; height: 100%; object-fit: cover; }
+.ph-box { border: 2px dashed #9a9a9a; background: #f4f4f4; padding: 2rem 1rem; text-align: center; color: var(--muted); }
+
+/* ------------------------------------------------------------------------------
+   Shared bits: link lists, meta lines, footer
+   ------------------------------------------------------------------------------ */
+/* Link lists "a / b / c". Flex drops the whitespace between the links, and the
+   slash sits in the gap outside each link, so a red .todo link doesn't paint it. */
+.links { color: var(--muted); display: flex; flex-wrap: wrap; column-gap: 1.3em; }
+.links > * { position: relative; }
+.links > * + *::before { content: "/"; position: absolute; left: -0.9em; color: var(--muted); background: none; }
+.meta { color: var(--muted); font-size: 0.88rem; margin-bottom: 0.35rem; }
+.site-footer { border-top: 1px solid var(--rule); margin-top: 3rem; padding: 1.2rem 0 2rem; color: var(--muted); font-size: 0.85rem; }
+
+/* ------------------------------------------------------------------------------
+   Home: compact header (bio left, photo right)
+   ------------------------------------------------------------------------------ */
+.home-header {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  grid-template-areas: "name photo" "bio photo";
+  gap: 0 2rem; align-items: center;
+  margin: 2.5rem 0 1rem;
+}
+.home-header .photo { grid-area: photo; width: 200px; }
+.home-header .name { grid-area: name; text-align: center; }
+.home-header .bio { grid-area: bio; }
+.home-header h1 { font-size: 2rem; font-weight: 400; margin: 0 0 0.4rem; }
+.home-header .name .links { justify-content: center; margin-bottom: 0.8rem; }
+
+/* ------------------------------------------------------------------------------
+   Project rows (Barron): clip left, text right
+   ------------------------------------------------------------------------------ */
+.rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.row { display: grid; grid-template-columns: 200px 1fr; gap: 1.25rem; padding: 0.9rem; align-items: start; }
+.row.key { background: var(--highlight); }
+.row p { margin: 0.3rem 0 0; font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------------------
+   Home: short timeline at the bottom
+   ------------------------------------------------------------------------------ */
+.mini-timeline { list-style: none; margin: 0; padding: 0; font-size: 0.92rem; }
+.mini-timeline li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0.75rem; padding: 0.25rem 0; border-bottom: 1px solid var(--rule); }
+.mini-timeline .when { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------------------
+   Project page: article column (problem → approach → result → own role)
+   ------------------------------------------------------------------------------ */
+.article { max-width: 720px; }
+.article h1 { font-size: 1.9rem; margin: 2rem 0 0.4rem; }
+.article .hero { margin: 1.2rem 0 0.4rem; }
+.article .caption { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+.article ul { padding-left: 1.2rem; }
+.article li { margin-bottom: 0.35rem; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; font-size: 0.92rem; margin: 1rem 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.figure-num { font-size: 1.6rem; font-weight: 600; }
+.numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0 1.2rem; }
+.numbers div { border-left: 3px solid var(--link); padding-left: 0.75rem; font-size: 0.88rem; color: var(--muted); }
+
+/* ------------------------------------------------------------------------------
+   CV page
+   ------------------------------------------------------------------------------ */
+.cv h1 { font-size: 1.9rem; margin: 2rem 0 0.2rem; }
+.cv-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 1rem; }
+.cv-entry { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0 1.25rem; margin-bottom: 1rem; }
+.cv-entry .when { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.cv-entry ul { margin: 0.25rem 0 0; padding-left: 1.1rem; font-size: 0.93rem; }
+.cv-entry .org { color: var(--muted); }
+.cv h2 { border-bottom: 1px solid var(--rule); padding-bottom: 0.3rem; }
+.pdf-btn { border: 1px solid var(--link); border-radius: 4px; padding: 0.3rem 0.8rem; }
+
+/* ------------------------------------------------------------------------------
+   Phone width. The home header shrinks to a 96 px photo beside the name and
+   links, so the first project row starts on the first screen (390×844).
+   ------------------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+  .topnav ul { gap: 0.9rem; }
+
+  .home-header {
+    grid-template-columns: 96px 1fr;
+    grid-template-areas: "photo name" "bio bio";
+    gap: 0.75rem 1rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .home-header .photo { width: 96px; font-size: 0.65rem; }
+  .home-header .name { text-align: left; }
+  .home-header h1 { font-size: 1.6rem; }
+  .home-header .name .links { justify-content: flex-start; margin-bottom: 0; }
+  .home-header .bio p { margin-bottom: 0.5rem; }
+  .home-intro { display: none; }   /* "Selected work…" line: obvious on a phone */
+  h2#projects { margin-top: 1.2rem; }
+
+  .row { grid-template-columns: 1fr; gap: 0.6rem; padding: 0.6rem 0; }
+  .row.key { padding: 0.6rem; }
+  .mini-timeline li { grid-template-columns: 1fr; gap: 0; }
+  .cv-entry { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: 1fr; }
+  .facts dd { margin-bottom: 0.4rem; }
+}
