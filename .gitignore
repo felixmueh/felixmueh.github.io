@@ -1,2 +1,7 @@
 build/
 target/
+# Symlinks to the Bewerbung repo's CV data (README.md, "Content from cv.yaml").
+# Never commit them: cv.yaml holds address, phone, private e-mail and birth date.
+data/
+__pycache__/
+.pytest_cache/

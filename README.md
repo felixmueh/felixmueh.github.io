@@ -3,7 +3,9 @@
 Personal website of Felix Mühlenberend: a short bio, his projects with silent
 looping clips (each with its own page), an HTML CV and a legal page. Plain
 static HTML and CSS with one small script (`site.js`, pause controls for the
-clips); no build step. Served by GitHub Pages from the root of `main`.
+clips). No build step on the server: the project rows and the CV body are
+rendered into the HTML from Felix's CV data before committing (below).
+Served by GitHub Pages from the root of `main`.
 
 Pages: `index.html` (Home), `projects/*.html` (one page per project),
 `cv.html`, `legal.html` (Impressum / Datenschutz).
@@ -41,12 +43,55 @@ run
 
 It lists every item by page and exits non-zero while any are left.
 
-## CV page
+## Content from cv.yaml
 
-`cv.html` is for now a hand-written mock based on the CV data in the
-Bewerbung repo (`cv/data/cv.yaml`). It will later be generated from that
-data; once that exists, don't edit `cv.html` by hand. It deliberately leaves
-out street address, phone, date of birth and photo.
+The project rows on the home page and the body of the CV page are generated
+from Felix's CV data in the Bewerbung repo (`cv/data/cv.yaml`), the same
+file the PDF CV is built from:
+
+- **project rows** (`index.html`): one per entry with a `web:` block
+  (order, title, meta line, summary, clip, links; schema in that repo's
+  `cv/README.md`);
+- **CV body** (`cv.html`): the PDF CV's default layout
+  (`cv/data/presets.yaml`) with the `general` projects, in English.
+
+**Edit project and CV text in Bewerbung's `cv.yaml`, never in the HTML
+between the markers** `<!-- BEGIN generated: … -->` / `<!-- END generated:
+… -->`: the next render overwrites it. Everything outside the markers
+(header, bio, timeline, e-mail alias) is hand-written. Then:
+
+    python3 tools/render.py
+
+(Python 3 with PyYAML and Jinja2, the CV generator's libraries.) Commit the
+re-rendered pages.
+
+### Setup on a new machine
+
+The script reads the data through two symlinks in `data/`, relative to
+this repo, so both repos must sit where they do here
+(`~/_Projects/felixmueh.github.io` and `~/_Documents/Bewerbung`):
+
+    mkdir -p data
+    ln -s ../../../_Documents/Bewerbung/cv/data/cv.yaml data/cv.yaml
+    ln -s ../../../_Documents/Bewerbung/cv/data/presets.yaml data/presets.yaml
+
+Without them `tools/render.py` stops with a message; there is no cached
+copy to fall back on.
+
+### Privacy: why `data/` is never committed
+
+`cv.yaml` holds Felix's street address, phone number, private e-mail and
+date of birth, and GitHub Pages publishes everything committed to this
+repo. So `data/` is in `.gitignore`, and the script takes nothing from
+`person` (name, GitHub and LinkedIn would be allowed; the headers that show
+them are hand-written) and skips lines tagged `confidential`. The CV page
+deliberately leaves out street address, phone, date of birth and photo.
+`tools/tests/test_render.py` renders with the real data and fails if any
+private `person` value reaches a page:
+
+    python3 -m pytest tools/tests    # any Python with pytest, PyYAML, Jinja2
+
+Before committing, check that `git ls-files data` prints nothing.
 
 ## Layout prototype
 
