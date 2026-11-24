@@ -154,6 +154,18 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .row p { margin: 0.3rem 0 0; font-size: 0.95rem; }
 
 /* ------------------------------------------------------------------------------
+   Home: "More projects", the compact text-only list below the rows (projects
+   without a useful picture). Indented like the row text, no picture column.
+   ------------------------------------------------------------------------------ */
+.more-projects { list-style: none; margin: 0; padding: 0 0.9rem; }
+.more-projects li { padding: 0.55rem 0; border-bottom: 1px solid var(--rule); }
+.more-projects li:last-child { border-bottom: 0; }
+.more-projects h3 { font-size: 1rem; margin: 0; }
+.more-projects .meta { font-size: 0.82rem; margin: 0.1rem 0 0.2rem; }
+.more-projects p { margin: 0 0 0.2rem; font-size: 0.9rem; }
+.more-projects .links { font-size: 0.88rem; }
+
+/* ------------------------------------------------------------------------------
    Home: short timeline at the bottom
    ------------------------------------------------------------------------------ */
 .mini-timeline { list-style: none; margin: 0; padding: 0; font-size: 0.92rem; }
@@ -212,6 +224,7 @@ code { font-family: var(--mono); font-size: 0.9em; }
 
   .row { grid-template-columns: 1fr; gap: 0.6rem; padding: 0.6rem 0; }
   .row.key { padding: 0.6rem; }
+  .more-projects { padding: 0; }
   .mini-timeline li { grid-template-columns: 1fr; gap: 0; }
   .cv-entry { grid-template-columns: 1fr; }
   .facts { grid-template-columns: 1fr; }

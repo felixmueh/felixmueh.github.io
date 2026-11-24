@@ -6,7 +6,9 @@
 Inputs:  data/cv.yaml, data/presets.yaml: git-ignored symlinks into the
          Bewerbung repo (cv/data/), see README.md "Content from cv.yaml".
 Outputs: index.html  the project rows, between
-                     <!-- BEGIN generated: projects --> and <!-- END generated: projects -->
+                     <!-- BEGIN generated: projects --> and <!-- END generated: projects -->,
+                     and the "More projects" list, between
+                     <!-- BEGIN generated: more-projects --> and <!-- END generated: more-projects -->
          cv.html     the CV body, between
                      <!-- BEGIN generated: cv --> and <!-- END generated: cv -->
 Everything outside the markers stays hand-written and is left alone.
@@ -139,8 +141,14 @@ def to_html(text: str) -> Markup:
 # hand-written rows' (style.css: .row, .row.key, .ph, .clip, .meta, .links).
 # `reviewed` is Felix's approval marker (Bewerbung cv/README.md, "reviewed");
 # it is accepted here and not rendered.
+#
+# `section` splits the rows into two lists (Felix, 25.11.2026): like on
+# jonbarron.info every row of the main list has a picture, and projects
+# without a useful one go to the compact text-only "More projects" list
+# below it. Each list is sorted by `order`, which stays unique across both.
 WEB_KEYS = {"order", "highlight", "title", "meta", "tech", "summary", "clip", "still", "page",
-            "links", "reviewed"}
+            "links", "reviewed", "section"}
+SECTIONS = ("main", "more")
 
 
 def row_media(web: dict, where: str) -> dict | None:
@@ -195,8 +203,19 @@ def project_rows(data: dict) -> list[dict]:
             raise RenderError(f"{where}: unknown key(s) {', '.join(unknown)}")
         if not isinstance(web.get("order"), int):
             raise RenderError(f"{where}: `order` must be a number")
+        section = web.get("section", "main")
+        if section not in SECTIONS:
+            raise RenderError(f"{where}.section: must be one of {', '.join(SECTIONS)}, not {section!r}")
+        # The "More projects" list has no picture column and no highlight, so
+        # these would vanish from the site without a word (the Bewerbung build
+        # rejects them too).
+        if section == "more":
+            unshown = [k for k in ("clip", "still", "highlight") if web.get(k)]
+            if unshown:
+                raise RenderError(f"{where}: {', '.join(unshown)} not shown in \"More projects\" "
+                                  f"(section: more)")
 
-        media = row_media(web, where)
+        media = row_media(web, where) if section == "main" else None
 
         # Links: "project page" first when there is a page, then the listed
         # ones. A link without url is shown as text (usually a placeholder).
@@ -217,6 +236,7 @@ def project_rows(data: dict) -> list[dict]:
         title_url = web.get("page") or next((l["url"] for l in links if l["url"]), None)
         rows.append({
             "order": web["order"],
+            "section": section,
             "highlight": bool(web.get("highlight")),
             "title": to_html(pick(web.get("title") or e.get("title"), f"{where}.title")),
             "title_url": title_url,
@@ -230,6 +250,12 @@ def project_rows(data: dict) -> list[dict]:
     if len(orders) != len(set(orders)):
         raise RenderError(f"web.order used twice: {sorted(orders)}")
     return sorted(rows, key=lambda r: r["order"])
+
+
+def split_sections(rows: list[dict]) -> tuple[list[dict], list[dict]]:
+    """The rows of the main list and of "More projects", each still in `order`."""
+    return ([r for r in rows if r["section"] == "main"],
+            [r for r in rows if r["section"] == "more"])
 
 
 ROWS_TEMPLATE = """\
@@ -267,6 +293,36 @@ ROWS_TEMPLATE = """\
       </div>
     </article>
 {%- endfor %}
+"""
+
+
+# "More projects": one compact entry per row, no picture column. The meta
+# line takes the tech labels as plain text, so an entry stays three short
+# lines: title and meta, summary, links. Empty list → no heading either.
+MORE_TEMPLATE = """\
+{% if rows %}
+  <h2 id="more-projects">More projects</h2>
+  <ul class="more-projects">
+{%- for r in rows %}
+    <li>
+      <h3>{% if r.title_url %}<a href="{{ r.title_url }}">{{ r.title }}</a>{% else %}{{ r.title }}{% endif %}</h3>
+{%- if r.meta or r.tech %}
+      <div class="meta">{{ r.meta }}{% if r.meta and r.tech %} · {% endif %}{{ r.tech|join(', ') }}</div>
+{%- endif %}
+{%- if r.summary %}
+      <p>{{ r.summary }}</p>
+{%- endif %}
+{%- if r.links %}
+      <div class="links">
+{%- for l in r.links %}
+        {% if l.comment %}{{ l.comment }}{% endif %}{% if l.url %}<a href="{{ l.url }}"{{ ' class="todo"'|safe if l.todo }}>{{ l.label }}</a>{% else %}<span{{ ' class="todo"'|safe if l.todo }}>{{ l.label }}</span>{% endif %}
+{%- endfor %}
+      </div>
+{%- endif %}
+    </li>
+{%- endfor %}
+  </ul>
+{%- endif %}
 """
 
 
@@ -375,11 +431,14 @@ def main() -> int:
         data = load("cv.yaml")
         presets = load("presets.yaml")
         env = jinja2.Environment(autoescape=True, keep_trailing_newline=True)
-        rows = env.from_string(ROWS_TEMPLATE).render(rows=project_rows(data))
+        main_rows, more_rows = split_sections(project_rows(data))
+        rows = env.from_string(ROWS_TEMPLATE).render(rows=main_rows)
+        more = env.from_string(MORE_TEMPLATE).render(rows=more_rows)
         cv = env.from_string(CV_TEMPLATE).render(sections=cv_sections(data, presets))
         # Render both pages before writing either, so an error leaves both untouched.
+        index = splice((ROOT / "index.html").read_text(encoding="utf-8"), "projects", rows)
         pages = {
-            "index.html": splice((ROOT / "index.html").read_text(encoding="utf-8"), "projects", rows),
+            "index.html": splice(index, "more-projects", more),
             "cv.html": splice((ROOT / "cv.html").read_text(encoding="utf-8"), "cv", cv),
         }
     except RenderError as e:

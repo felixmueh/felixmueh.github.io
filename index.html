@@ -1,8 +1,8 @@
 <!doctype html>
 <!--
   Home page (layout "variant A", chosen 24.11.2026): compact header with photo, bio
-  and links; project rows with looping clips as the main content; a short timeline
-  at the bottom. Facts come from the Bewerbung repo (docs/profile.md, docs/cv-pool/,
+  and links; project rows with looping clips as the main content; a compact
+  text-only "More projects" list below them; a short timeline at the bottom. Facts come from the Bewerbung repo (docs/profile.md, docs/cv-pool/,
   docs/projects.md, cv/data/cv.yaml). Placeholders: class "todo" plus a TODO(felix)
   comment; list them with tools/check_todos.sh.
 -->
@@ -93,7 +93,7 @@
       </div>
     </article>
     <article class="row">
-      <div></div>
+      <div class="still"><img src="media/mercedes/mercedes.jpg" alt="Simulation automation at Mercedes-Benz"></div>
       <div>
         <h3>Simulation automation at Mercedes-Benz</h3>
         <div class="meta">Working student · 2021–2023</div>
@@ -163,7 +163,7 @@
       </div>
     </article>
     <article class="row">
-      <div></div>
+      <div class="still"><img src="media/mima-c/mima-c.jpg" alt="mima-c: a C subset for the MIMA teaching CPU"></div>
       <div>
         <h3><a href="https://github.com/felixmueh/mima-c">mima-c: a C subset for the MIMA teaching CPU</a></h3>
         <div class="meta">With Bertil Braun · 2021</div>
@@ -185,15 +185,6 @@
       </div>
     </article>
     <article class="row">
-      <div></div>
-      <div>
-        <h3>emacs-todoist: two-way sync between Org mode and Todoist</h3>
-        <div class="meta">Solo, with AI coding agents · 2026</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Emacs Lisp</li><li>Todoist Sync API</li><li>ERT</li></ul>
-        <p>Keeps the TODO items of Emacs Org mode and Todoist in sync in both directions through Todoist's Sync API, with conflict detection. Built with AI coding agents and covered by about 260 ERT tests.</p>
-      </div>
-    </article>
-    <article class="row">
       <div class="still"><img src="media/mannys-world-theory/mannys-world-theory.jpg" alt="Mannys World Theory"></div>
       <div>
         <h3>Mannys World Theory</h3>
@@ -209,18 +200,6 @@
         <div class="meta">Car designer, school team of 6 · 2014–2016</div>
         <ul class="tech" aria-label="Languages and tools"><li>Solid Edge</li><li>Siemens NX</li><li>CFD</li><li>CNC milling</li></ul>
         <p>Not software: for a school competition I designed our team's model race car in 3D CAD, optimised it with CFD and wind-tunnel tests and had it CNC-machined. German runner-up 2015 with the fastest car and 8th at the 2015 World Finals in Singapore; afterwards I supervised team Endeavour on its way to the 2016 World Finals in Austin.</p>
-      </div>
-    </article>
-    <article class="row">
-      <div></div>
-      <div>
-        <h3><a href="https://github.com/felixmueh/EclipseCPP">Embedded projects: standing-desk controller, EEPROM programmer, gadgets</a></h3>
-        <div class="meta">Solo · 2018–2026</div>
-        <ul class="tech" aria-label="Languages and tools"><li>C++</li><li>Arduino</li><li>ESP32</li><li>I2C</li><li>Python</li></ul>
-        <div class="links">
-          <a href="https://github.com/felixmueh/EclipseCPP">LED-matrix snake code</a>
-        </div>
-        <p>Firmware for my DIY standing desk: three Arduinos over I2C with Hall-sensor position tracking, PID levelling of both legs and collision detection, redesigned in 2026 with AI coding agents. Smaller pieces: an EEPROM programmer (Arduino Mega firmware with a Python host) and Arduino/ESP32 gadgets such as a Home Assistant button remote and an LED-matrix snake.</p>
       </div>
     </article>
     <article class="row">
@@ -247,24 +226,6 @@
       </div>
     </article>
     <article class="row">
-      <div></div>
-      <div>
-        <h3>tiny_ecs: an entity-component system in Rust</h3>
-        <div class="meta">Solo · 2023</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Rust</li><li>procedural macros</li></ul>
-        <p>An ECS library written from scratch in two weeks: generational indices, type-erased component storage, typed tuple queries and a derive macro, with unit tests. It grew out of a Dwarf-Fortress-like game prototype.</p>
-      </div>
-    </article>
-    <article class="row">
-      <div></div>
-      <div>
-        <h3>A mini Prolog in Rust</h3>
-        <div class="meta">Solo · 2023</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Rust</li><li>declarative macros</li></ul>
-        <p>Terms, facts and rules written with declarative macros, unification, and lazy SLD resolution that yields all answers as an iterator, with unit tests. An unfinished exercise: the parser is a stub and repeated variables aren't handled yet.</p>
-      </div>
-    </article>
-    <article class="row">
       <div class="clip"><video loop muted playsinline preload="metadata" poster="media/cpp-game-engine/cpp-game-engine.jpg" aria-label="Clip: A top-down shooter on my own C++/OpenGL engine"><source src="media/cpp-game-engine/cpp-game-engine.webm" type="video/webm"><source src="media/cpp-game-engine/cpp-game-engine.mp4" type="video/mp4"></video></div>
       <div>
         <h3>A top-down shooter on my own C++/OpenGL engine</h3>
@@ -278,6 +239,41 @@
     </article>
     <!-- END generated: projects -->
   </div>
+
+  <!-- ==========================================================================
+       More projects: compact, text only, for projects without a useful
+       picture (web.section: more in cv.yaml; Felix, 25.11.2026). Generated
+       like the rows above; the heading disappears with the last entry.
+       ========================================================================== -->
+  <!-- BEGIN generated: more-projects -->
+  <!-- Generated by tools/render.py from data/cv.yaml (the Bewerbung repo's cv/data/cv.yaml). Don't edit here: edit cv.yaml and run the script. -->
+  <h2 id="more-projects">More projects</h2>
+  <ul class="more-projects">
+    <li>
+      <h3>emacs-todoist: two-way sync between Org mode and Todoist</h3>
+      <div class="meta">Solo, with AI coding agents · 2026 · Emacs Lisp, Todoist Sync API, ERT</div>
+      <p>Keeps the TODO items of Emacs Org mode and Todoist in sync in both directions through Todoist's Sync API, with conflict detection. Built with AI coding agents and covered by about 260 ERT tests.</p>
+    </li>
+    <li>
+      <h3><a href="https://github.com/felixmueh/EclipseCPP">Embedded projects: standing-desk controller, EEPROM programmer, gadgets</a></h3>
+      <div class="meta">Solo · 2018–2026 · C++, Arduino, ESP32, I2C, Python</div>
+      <p>Firmware for my DIY standing desk: three Arduinos over I2C with Hall-sensor position tracking, PID levelling of both legs and collision detection, redesigned in 2026 with AI coding agents. Smaller pieces: an EEPROM programmer (Arduino Mega firmware with a Python host) and Arduino/ESP32 gadgets such as a Home Assistant button remote and an LED-matrix snake.</p>
+      <div class="links">
+        <a href="https://github.com/felixmueh/EclipseCPP">LED-matrix snake code</a>
+      </div>
+    </li>
+    <li>
+      <h3>tiny_ecs: an entity-component system in Rust</h3>
+      <div class="meta">Solo · 2023 · Rust, procedural macros</div>
+      <p>An ECS library written from scratch in two weeks: generational indices, type-erased component storage, typed tuple queries and a derive macro, with unit tests. It grew out of a Dwarf-Fortress-like game prototype.</p>
+    </li>
+    <li>
+      <h3>A mini Prolog in Rust</h3>
+      <div class="meta">Solo · 2023 · Rust, declarative macros</div>
+      <p>Terms, facts and rules written with declarative macros, unification, and lazy SLD resolution that yields all answers as an iterator, with unit tests. An unfinished exercise: the parser is a stub and repeated variables aren't handled yet.</p>
+    </li>
+  </ul>
+  <!-- END generated: more-projects -->
 
   <!-- ==========================================================================
        Short timeline

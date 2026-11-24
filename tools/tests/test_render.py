@@ -168,3 +168,49 @@ def test_missing_media_leaves_an_empty_slot_with_a_warning(tmp_path, monkeypatch
 
     assert rows[0]["media"] is None
     assert "media/werk/werk.webm doesn't exist" in capsys.readouterr().err
+
+
+# ==============================================================================
+# section: the main list or "More projects"
+# ==============================================================================
+def entries(*webs) -> dict:
+    return {"entries": [{"id": f"werk{i}", "title": f"Werk {i}", "web": web}
+                        for i, web in enumerate(webs)]}
+
+
+def test_more_rows_go_to_their_own_list_each_in_order():
+    rows = render.project_rows(entries(
+        {"order": 4, "section": "more"}, {"order": 1}, {"order": 2, "section": "more"},
+        {"order": 3, "section": "main"}))
+
+    main, more = render.split_sections(rows)
+
+    assert [r["order"] for r in main] == [1, 3]
+    assert [r["order"] for r in more] == [2, 4]
+
+
+def test_more_list_is_compact_text_with_tech_in_the_meta_line():
+    rows = render.project_rows(entries({
+        "order": 1, "section": "more", "meta": "Solo · 2023", "tech": ["Rust", "macros"],
+        "summary": "An ECS.", "links": [{"label": "code", "url": "https://example.org/ecs"}]}))
+    html_out = render.jinja2.Environment(autoescape=True).from_string(render.MORE_TEMPLATE).render(rows=rows)
+
+    assert '<h2 id="more-projects">More projects</h2>' in html_out
+    assert '<div class="meta">Solo · 2023 · Rust, macros</div>' in html_out
+    assert '<a href="https://example.org/ecs">code</a>' in html_out
+    assert "<img" not in html_out and "<video" not in html_out
+
+
+def test_empty_more_list_renders_no_heading():
+    html_out = render.jinja2.Environment(autoescape=True).from_string(render.MORE_TEMPLATE).render(rows=[])
+    assert html_out.strip() == ""
+
+
+def test_an_unknown_section_fails():
+    with pytest.raises(render.RenderError, match="section"):
+        render.project_rows(entries({"order": 1, "section": "extra"}))
+
+
+def test_media_in_more_fails():
+    with pytest.raises(render.RenderError, match="still"):
+        render.project_rows(entries({"order": 1, "section": "more", "still": "media/werk/werk.jpg"}))
