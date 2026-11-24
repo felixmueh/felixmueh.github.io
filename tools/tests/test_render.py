@@ -4,8 +4,7 @@ Run from the repo root with any Python that has pytest, PyYAML and Jinja2:
     python3 -m pytest tools/tests
 
 The privacy test is the important one: data/cv.yaml (a symlink into the
-Bewerbung repo) holds Felix's address, phone, private e-mail and date of
-birth, and everything committed here is published. It renders with the
+Bewerbung repo) holds Felix's address, phone and date of birth, and everything committed here is published. It renders with the
 real data in a temporary copy of the site and checks that none of those
 values reaches any page.
 """
@@ -53,13 +52,15 @@ def run_render(site: Path) -> subprocess.CompletedProcess:
 def private_values(person: dict) -> list[str]:
     """The `person` values that must never be published, with their parts.
 
-    Not checked: name, github, linkedin (public on purpose), subtitle (a job
+    Not checked: name, github, linkedin (public on purpose), email (the
+    hand-written headers show it on purpose, Felix 24.11.2026; render.py
+    still takes nothing from `person`), subtitle (a job
     title, shown in the hand-written header), and city: "Karlsruhe" is part
     of public names ("Karlsruhe Institute of Technology") and the
     hand-written bio says it on purpose.
     """
     values = []
-    for key in ("address", "phone", "email", "birth", "photo", "signature"):
+    for key in ("address", "phone", "birth", "photo", "signature"):
         raw = person.get(key)
         if raw is None:
             continue
@@ -78,7 +79,7 @@ def private_values(person: dict) -> list[str]:
 def test_no_private_person_field_reaches_any_page(site):
     person = yaml.safe_load((site / "data" / "cv.yaml").read_text(encoding="utf-8"))["person"]
     private = private_values(person)
-    assert any("@" in v for v in private), "the real data should have a private e-mail to check"
+    assert person.get("address") and person.get("phone"), "the real data should have an address and phone to check"
 
     res = run_render(site)
     assert res.returncode == 0, res.stderr

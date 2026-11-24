@@ -3,6 +3,7 @@
   Thesis case study. Order: problem → approach → result → own role
   (docs/guides/personal-website-demos.md §1.2 in the Bewerbung repo).
   Facts: docs/cv-pool/education-work.md §2.2 (thesis), docs/projects.md (GATO PRs).
+  Also the home of tiago_mpc and the MPCGPU study (no rows of their own, Felix 24.11.2026).
   Placeholders: class "todo" plus a TODO(felix) comment; see tools/check_todos.sh.
 -->
 <!-- TODO(felix): before publishing: lab permission for robot footage and the TIAGo mesh licence (PAL Robotics) -->
@@ -11,7 +12,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GPU-accelerated MPC on a real robot arm · Felix Mühlenberend</title>
-<meta name="description" content="Master's thesis: the GPU trajectory optimizer GATO as a model predictive controller on the embedded Jetson of a TIAGo Pro robot arm.">
+<meta name="description" content="Master's thesis: the GPU trajectory optimiser GATO as a model predictive controller on the embedded Jetson of a TIAGo Pro robot arm.">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -33,7 +34,7 @@
 
   <div class="hero">
     <!-- TODO(felix): hero clip, TIAGo arm under MPC -->
-    <div class="ph clip todo">TIAGo Pro right arm reaching a target under MPC, solver on the Jetson<br>6 s loop, silent</div>
+    <div class="ph clip todo">TIAGo Pro right arm reaching a target under MPC, solver on the Jetson</div>
   </div>
   <p class="caption">The TIAGo Pro's right arm under model predictive control, with the solver running on the robot's own Jetson. <!-- TODO(felix): which run is the clip from, simulation or the real arm? --><span class="todo">[which run? sim or real arm?]</span></p>
 
@@ -41,11 +42,11 @@
     <dt>Title</dt><dd>Embedded GPU-Accelerated Model Predictive Control: Adapting and Evaluating GATO for the TIAGo Pro</dd>
     <dt>Where</dt><dd>KIT, Institute of Anthropomatics and Robotics, group Optimization and Biomechanics for Human-Centred Robotics</dd>
     <dt>Supervision</dt><dd>Prof. Dr. Katja Mombaur, Prof. Dr. Gerhard Neumann; advisor Dr. Jonas Große Sundrup</dd>
-    <dt>Links</dt><dd class="links"><!-- TODO(felix): thesis PDF link (publish it?) --><a href="#" class="todo">thesis PDF</a><a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">merged PRs in GATO</a><a href="https://github.com/A2R-Lab/GATO">GATO</a></dd>
+    <dt>Links</dt><dd class="links"><a href="../files/Muehlenberend_MSc-Thesis.pdf">thesis PDF (7.6 MB)</a><a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">merged PRs in GATO</a><a href="https://github.com/A2R-Lab/GATO">GATO</a><a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc</a><a href="https://github.com/felixmueh/MPCGPU">MPCGPU study</a></dd>
   </dl>
 
   <h2>Problem</h2>
-  <p>Model predictive control re-plans a robot's motion many times per second, so the trajectory optimizer has to be fast. GPU solvers such as GATO are fast on desktop GPUs, but running one end to end on a real robot, on an embedded computer, was named as future work by the GATO and MPCGPU authors.</p>
+  <p>Model predictive control re-plans a robot's motion many times per second, so the trajectory optimiser has to be fast. GPU solvers such as GATO are fast on desktop GPUs, but running one end to end on a real robot, on an embedded computer, was named as future work by the GATO and MPCGPU authors.</p>
   <p>The question: can GATO control the 7-joint right arm of a TIAGo Pro mobile manipulator from the NVIDIA Jetson AGX Orin in the robot's backpack?</p>
 
   <h2>Approach</h2>
@@ -84,6 +85,20 @@
   <p>A solo master's thesis: I did the integration, the experiments and the writing; the GATO maintainers reviewed and merged the upstream fixes. I used Claude Code, OpenAI Codex and GitHub Copilot for text and code, and reviewed and tested all core code myself; the pull requests say so too.</p>
   <!-- TODO(felix): anything to add on what the lab provided? -->
   <p><span class="todo">[Felix: anything to add on what the lab provided (robot setup, base software)?]</span></p>
+
+  <!-- The two projects around the thesis have no rows of their own on the home page
+       (Felix, 24.11.2026); texts from their former web: blocks in cv.yaml. -->
+  <h2>Before the thesis: MPCGPU</h2>
+  <p>In the lab course Mathematical and Computational Methods in Robotics and AI I reproduced the GPU solver MPCGPU for model predictive control, instrumented it (kernel timing, VRAM logging) and wrote CUDA line-search variants, with automated experiments on the HPC cluster. The groundwork for my master's thesis.</p>
+  <p class="links"><a href="https://github.com/felixmueh/MPCGPU">code (fork)</a></p>
+
+  <h2>After the thesis: tiago_mpc</h2>
+  <div class="hero">
+    <div class="clip"><video loop muted playsinline preload="metadata" poster="../media/gato-tiago/gato-tiago.jpg" aria-label="Clip: tiago_mpc"><source src="../media/gato-tiago/gato-tiago.webm" type="video/webm"><source src="../media/gato-tiago/gato-tiago.mp4" type="video/mp4"></video></div>
+  </div>
+  <p class="caption">A recorded tiago_mpc run replayed in gato_visualizer: the right arm traces a figure eight.</p>
+  <p>A clean rewrite of my thesis controller after the thesis, built on the PyPI package gato-mpc: torque-level MPC for the TIAGo Pro's arm with a ROS 2 plant and a separate safety process. Written largely with AI coding agents; typed, 266 tests, and it runs on the real robot.</p>
+  <p class="links"><a href="https://github.com/felixmueh/tiago_mpc">code</a></p>
 </main>
 
 <footer class="site-footer">

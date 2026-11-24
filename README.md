@@ -58,7 +58,7 @@ file the PDF CV is built from:
 **Edit project and CV text in Bewerbung's `cv.yaml`, never in the HTML
 between the markers** `<!-- BEGIN generated: … -->` / `<!-- END generated:
 … -->`: the next render overwrites it. Everything outside the markers
-(header, bio, timeline, e-mail alias) is hand-written. Then:
+(header with the contact links, bio, timeline) is hand-written. Then:
 
     python3 tools/render.py
 
@@ -80,11 +80,11 @@ copy to fall back on.
 
 ### Privacy: why `data/` is never committed
 
-`cv.yaml` holds Felix's street address, phone number, private e-mail and
-date of birth, and GitHub Pages publishes everything committed to this
-repo. So `data/` is in `.gitignore`, and the script takes nothing from
-`person` (name, GitHub and LinkedIn would be allowed; the headers that show
-them are hand-written) and skips lines tagged `confidential`. The CV page
+`cv.yaml` holds Felix's street address, phone number and date of birth,
+and GitHub Pages publishes everything committed to this repo. So `data/`
+is in `.gitignore`, and the script takes nothing from `person` (name,
+e-mail, GitHub and LinkedIn are public; the headers that show them are
+hand-written) and skips lines tagged `confidential`. The CV page
 deliberately leaves out street address, phone, date of birth and photo.
 `tools/tests/test_render.py` renders with the real data and fails if any
 private `person` value reaches a page:
