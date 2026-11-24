@@ -137,7 +137,48 @@ def to_html(text: str) -> Markup:
 # ==============================================================================
 # One row per entry with a `web:` block, by `web.order`. The markup is the
 # hand-written rows' (style.css: .row, .row.key, .ph, .clip, .meta, .links).
-WEB_KEYS = {"order", "highlight", "title", "meta", "summary", "clip", "still", "page", "links"}
+# `reviewed` is Felix's approval marker (Bewerbung cv/README.md, "reviewed");
+# it is accepted here and not rendered.
+WEB_KEYS = {"order", "highlight", "title", "meta", "tech", "summary", "clip", "still", "page",
+            "links", "reviewed"}
+
+
+def row_media(web: dict, where: str) -> dict | None:
+    """The media slot of a row: a real clip (with the still as its poster),
+    a real still, a [[placeholder]] stand-in, or None (an empty slot).
+
+    Paths are relative to this repo. The media are made by separate agents
+    and may not exist yet when a row already names them, so a named file
+    that is missing is left out with a warning instead of failing the
+    render: the row then shows the still, or an empty slot. That isn't a
+    fallback to a weaker source; it is the same empty slot a row without
+    media has, and the warning says what is missing.
+    """
+    clip, still = web.get("clip"), web.get("still")
+    for kind, src in (("clip", clip), ("still", still)):
+        if src and placeholder(src) is not None:
+            ph = placeholder(src)
+            return {"kind": kind, "placeholder": True, "comment": Markup(todo_comment(ph)),
+                    "text": to_html(ph)}
+
+    def present(src):
+        if src and not (ROOT / src).is_file():
+            print(f"render.py: warning: {where}: {src} doesn't exist; left out", file=sys.stderr)
+            return None
+        return src
+
+    clip, still = present(clip), present(still)
+    if clip:
+        # WebM first (smaller); the MP4 next to it, if there is one, for
+        # Safari versions without WebM.
+        mp4 = str(Path(clip).with_suffix(".mp4"))
+        sources = [{"src": clip, "type": "video/webm" if clip.endswith(".webm") else "video/mp4"}]
+        if mp4 != clip and (ROOT / mp4).is_file():
+            sources.append({"src": mp4, "type": "video/mp4"})
+        return {"kind": "clip", "placeholder": False, "sources": sources, "poster": still}
+    if still:
+        return {"kind": "still", "placeholder": False, "src": still}
+    return None
 
 
 def project_rows(data: dict) -> list[dict]:
@@ -155,21 +196,7 @@ def project_rows(data: dict) -> list[dict]:
         if not isinstance(web.get("order"), int):
             raise RenderError(f"{where}: `order` must be a number")
 
-        # Media: a real clip or still (a path in this repo), or a [[placeholder]]
-        # that becomes the grey stand-in box with its description.
-        media = None
-        for kind in ("clip", "still"):
-            src = web.get(kind)
-            if not src:
-                continue
-            ph = placeholder(src)
-            if ph is not None:
-                media = {"kind": kind, "placeholder": True, "comment": Markup(todo_comment(ph)),
-                         "text": to_html(ph)}
-            else:
-                # TODO: no real clip or still exists yet, so this markup is
-                # untested; add a poster image for clips (site.js expects one).
-                media = {"kind": kind, "placeholder": False, "src": src}
+        media = row_media(web, where)
 
         # Links: "project page" first when there is a page, then the listed
         # ones. A link without url is shown as text (usually a placeholder).
@@ -194,6 +221,7 @@ def project_rows(data: dict) -> list[dict]:
             "title": to_html(pick(web.get("title") or e.get("title"), f"{where}.title")),
             "title_url": title_url,
             "meta": to_html(pick(web.get("meta"), f"{where}.meta", required=False)),
+            "tech": [str(label) for label in web.get("tech") or []],
             "summary": to_html(pick(web.get("summary"), f"{where}.summary", required=False)),
             "media": media,
             "links": links,
@@ -211,7 +239,8 @@ ROWS_TEMPLATE = """\
       {{ r.media.comment }}
       <div class="ph{{ ' clip' if r.media.kind == 'clip' }} todo">{{ r.media.text }}</div>
 {%- elif r.media and r.media.kind == 'clip' %}
-      <div class="clip"><video loop muted playsinline preload="metadata" src="{{ r.media.src }}" aria-label="Clip: {{ r.title|striptags }}"></video></div>
+      <div class="clip"><video loop muted playsinline preload="metadata"{% if r.media.poster %} poster="{{ r.media.poster }}"{% endif %} aria-label="Clip: {{ r.title|striptags }}">
+{%- for s in r.media.sources %}<source src="{{ s.src }}" type="{{ s.type }}">{% endfor %}</video></div>
 {%- elif r.media %}
       <div class="still"><img src="{{ r.media.src }}" alt="{{ r.title|striptags }}"></div>
 {%- else %}
@@ -221,6 +250,9 @@ ROWS_TEMPLATE = """\
         <h3>{% if r.title_url %}<a href="{{ r.title_url }}">{{ r.title }}</a>{% else %}{{ r.title }}{% endif %}</h3>
 {%- if r.meta %}
         <div class="meta">{{ r.meta }}</div>
+{%- endif %}
+{%- if r.tech %}
+        <ul class="tech" aria-label="Languages and tools">{% for label in r.tech %}<li>{{ label }}</li>{% endfor %}</ul>
 {%- endif %}
 {%- if r.links %}
         <div class="links">

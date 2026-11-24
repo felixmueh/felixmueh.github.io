@@ -33,8 +33,12 @@ def site(tmp_path) -> Path:
     """A copy of the site; data/ holds copies of the linked files, not the links
     (a relative symlink would point nowhere from the temp folder)."""
     copy = tmp_path / "site"
-    shutil.copytree(SITE, copy, ignore=shutil.ignore_patterns(".git", ".worktrees", "__pycache__",
-                                                              ".pytest_cache"))
+    # Only what render.py reads and writes: the pages, data/ and tools/.
+    # build/ and target/ hold raw recordings (GBs) and media/ the clips;
+    # copying them into tmp_path (RAM-backed /tmp) once filled the tmpfs.
+    # Rows whose media are missing in the copy only warn (render.row_media).
+    shutil.copytree(SITE, copy, ignore=shutil.ignore_patterns(
+        ".git", ".worktrees", "__pycache__", ".pytest_cache", "build", "target", "media"))
     return copy
 
 
@@ -126,3 +130,40 @@ def test_placeholder_gets_a_todo_comment_and_class():
     out = render.to_html("from [[start date --> ask]]")
     assert out == ('from <!-- TODO(felix): start date –› ask --><span class="todo">'
                    'start date --&gt; ask</span>')
+
+
+# ==============================================================================
+# Project rows: schema keys and media
+# ==============================================================================
+def entry(**web) -> dict:
+    return {"entries": [{"id": "werk", "title": "Werk", "web": {"order": 1, **web}}]}
+
+
+def test_reviewed_is_accepted_and_tech_becomes_labels():
+    import datetime
+    rows = render.project_rows(entry(reviewed=datetime.date(2026, 11, 24), tech=["C++", "CUDA"]))
+    html_out = render.jinja2.Environment(autoescape=True).from_string(render.ROWS_TEMPLATE).render(rows=rows)
+    assert '<ul class="tech" aria-label="Languages and tools"><li>C++</li><li>CUDA</li></ul>' in html_out
+    assert "2026" not in html_out
+
+
+def test_clip_takes_the_still_as_poster_and_the_mp4_as_second_source(tmp_path, monkeypatch):
+    monkeypatch.setattr(render, "ROOT", tmp_path)
+    (tmp_path / "media" / "werk").mkdir(parents=True)
+    for name in ("werk.webm", "werk.mp4", "werk.jpg"):
+        (tmp_path / "media" / "werk" / name).write_bytes(b"x")
+
+    media = render.project_rows(entry(clip="media/werk/werk.webm", still="media/werk/werk.jpg"))[0]["media"]
+
+    assert media["poster"] == "media/werk/werk.jpg"
+    assert media["sources"] == [{"src": "media/werk/werk.webm", "type": "video/webm"},
+                                {"src": "media/werk/werk.mp4", "type": "video/mp4"}]
+
+
+def test_missing_media_leaves_an_empty_slot_with_a_warning(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(render, "ROOT", tmp_path)
+
+    rows = render.project_rows(entry(clip="media/werk/werk.webm", still="media/werk/werk.jpg"))
+
+    assert rows[0]["media"] is None
+    assert "media/werk/werk.webm doesn't exist" in capsys.readouterr().err
