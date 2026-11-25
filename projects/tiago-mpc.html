@@ -2,7 +2,8 @@
 <!--
   Thesis case study. Order: problem → approach → result → own role
   (docs/guides/personal-website-demos.md §1.2 in the Bewerbung repo).
-  Facts: docs/cv-pool/education-work.md §2.2 (thesis), docs/projects.md (GATO PRs).
+  Facts: docs/cv-pool/education-work.md §2.2 (thesis), docs/projects.md (GATO pull requests and issues).
+  GATO wording (Felix, 25.11.2026): "contributions (pull requests and issues)", no counts.
   Also the home of tiago_mpc and the MPCGPU study (no rows of their own, Felix 24.11.2026).
   Placeholders: class "todo" plus a TODO(felix) comment; see tools/check_todos.sh.
 -->
@@ -41,7 +42,7 @@
     <dt>Title</dt><dd>Embedded GPU-Accelerated Model Predictive Control: Adapting and Evaluating GATO for the TIAGo Pro</dd>
     <dt>Where</dt><dd>KIT, Institute of Anthropomatics and Robotics, group Optimization and Biomechanics for Human-Centred Robotics</dd>
     <dt>Supervision</dt><dd>Prof. Dr. Katja Mombaur, Prof. Dr. Gerhard Neumann (advisor: Dr. Jonas Große Sundrup)</dd>
-    <dt>Links</dt><dd class="links"><a href="../files/Muehlenberend_MSc-Thesis.pdf">thesis PDF (7.6 MB)</a><a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">merged PRs in GATO</a><a href="https://github.com/A2R-Lab/GATO">GATO</a><a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc</a><a href="https://github.com/felixmueh/MPCGPU">MPCGPU study</a></dd>
+    <dt>Links</dt><dd class="links"><a href="../files/Muehlenberend_MSc-Thesis.pdf">thesis PDF (7.6 MB)</a><a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">my pull requests in GATO</a><a href="https://github.com/A2R-Lab/GATO/issues?q=is%3Aissue%20author%3Afelixmueh">my issues in GATO</a><a href="https://github.com/A2R-Lab/GATO">GATO</a><a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc</a><a href="https://github.com/felixmueh/MPCGPU">MPCGPU study</a></dd>
   </dl>
 
   <h2>Problem</h2>
@@ -59,16 +60,16 @@
 
   <h2>Result</h2>
   <div class="numbers">
-    <div><span class="figure-num">≈ 150 /s</span><br>control updates on the Jetson, with up to 5 SQP iterations and 32 knot points</div>
+    <!-- 500/s: Felix 2026-11-25; the MA abstract (§10) says ~150 for 5 SQP iterations and 32 knots -->
+    <div><span class="figure-num">≈ 500</span><br>control updates per second at most, as far as the solve times on the Jetson allow</div>
     <div><span class="figure-num">13.0 ms</span><br>per update with the redesigned force estimation, instead of 44.9 ms</div>
-    <div><span class="figure-num">3</span><br>pull requests merged into GATO</div>
   </div>
   <ul>
     <li>Viable for setpoint and trajectory tracking. With one SQP iteration, still more than 100 updates per second for horizons of several seconds.</li>
     <li>In GATO's simulation, tracking on the Jetson is as accurate as on desktop GPUs up to 64 knot points. Gazebo and the real arm work end to end, but with degraded performance that points to the robot model, not to the solver.</li>
     <li>Force estimation: on the embedded GPU a batch takes several times as long as one problem, so I batch only the dynamics instead of whole optimisation problems. Same compensation of an external force, 13.0 instead of 44.9 ms per update.</li>
     <li><strong>What didn't work:</strong> batches of initial guesses (multi-start) found better motions in tuned experiments, e.g. around a moving obstacle, but didn't reach more goals in general.</li>
-    <li>Open source: porting exposed defects in GATO. Merged fixes include an ignored terminal cost weight (#17), a read/write race in the Schur assembly that also made batched solves about 35% faster (#18), and a crash on arms with mixed joint axes (#21).</li>
+    <li>Open source: porting exposed defects in GATO, which I reported in issues and fixed in pull requests. GATO adopted my contributions, among them fixes for an ignored terminal cost weight (#17), a read/write race in the Schur assembly that also made batched solves about 35% faster (#18), and a crash on arms with mixed joint axes (#21). My issue on solver timing on embedded GPUs (#19) led to a new default and a timing API, and my Jetson measurements are now in GATO's documentation.</li>
   </ul>
 
   <h2>Replay in the browser</h2>
@@ -76,7 +77,7 @@
   <p>The <a href="../demos/gato-visualizer/">gato_visualizer demo</a> replays recorded MPC runs of the TIAGo Pro in 3D in the browser. It shows recorded data only: GATO needs CUDA, which browsers don't have.</p>
 
   <h2>My role</h2>
-  <p>A solo master's thesis: I did the integration, the experiments and the writing, and the GATO maintainers reviewed and merged the upstream fixes. I used Claude Code, OpenAI Codex and GitHub Copilot for text and code, and reviewed and tested all core code myself. The pull requests say so too.</p>
+  <p>A solo master's thesis: I did the integration, the experiments and the writing, and the GATO maintainers reviewed and adopted my upstream contributions. I used Claude Code, OpenAI Codex and GitHub Copilot for text and code, and reviewed and tested all core code myself. The pull requests and issues say so too.</p>
 
   <!-- The two projects around the thesis have no rows of their own on the home page
        (Felix, 24.11.2026); texts from their former web: blocks in cv.yaml. -->

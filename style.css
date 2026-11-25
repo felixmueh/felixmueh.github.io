@@ -45,7 +45,6 @@ code { font-family: var(--mono); font-size: 0.9em; }
    The home page has no bar at all, its header holds the name and the links.
    ------------------------------------------------------------------------------ */
 .backlink { padding-top: 1rem; font-size: 0.95rem; }
-.lang-note { margin-top: 1.5rem; }
 
 /* ------------------------------------------------------------------------------
    Placeholders (TODO(felix)): every one carries the class .todo and a

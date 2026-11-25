@@ -60,15 +60,15 @@
       <div>
         <h3><a href="projects/tiago-mpc.html">GPU-accelerated MPC on a real robot arm</a></h3>
         <div class="meta">Master's thesis, KIT · 2026</div>
-        <ul class="tech" aria-label="Languages and tools"><li>CUDA/C++</li><li>Python</li><li>ROS 2</li><li>NVIDIA Jetson AGX Orin</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>CUDA C++</li><li>MPC</li><li>trajectory optimisation</li><li>embedded GPU</li><li>ROS 2</li><li>Gazebo</li><li>Python</li></ul>
         <div class="links">
           <a href="projects/tiago-mpc.html">project page</a>
           <a href="files/Muehlenberend_MSc-Thesis.pdf">thesis PDF (7.6 MB)</a>
-          <a href="https://github.com/A2R-Lab/GATO/pulls?q=is%3Apr+is%3Amerged+author%3Afelixmueh">merged GATO PRs</a>
+          <a href="https://github.com/A2R-Lab/GATO/pulls?q=is%3Apr+is%3Amerged+author%3Afelixmueh">my GATO pull requests</a>
           <a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc (code)</a>
           <a href="https://github.com/felixmueh/MPCGPU">MPCGPU study (code)</a>
         </div>
-        <p>I ported the GPU trajectory optimiser GATO to the right arm of a TIAGo Pro and ran it as a model predictive controller on the robot's embedded NVIDIA Jetson AGX Orin, in simulation and on the physical arm. Solve times allow about 150 control updates per second, and three fixes I found along the way were merged into GATO.</p>
+        <p>I ported the GPU trajectory optimiser GATO to the right arm of a TIAGo Pro and ran it as a model predictive controller on the robot's embedded NVIDIA Jetson AGX Orin, in simulation and on the physical arm. Solve times allow up to about 500 control updates per second, and GATO adopted the pull requests and issues I contributed along the way.</p>
       </div>
     </article>
     <article class="row">
@@ -76,9 +76,9 @@
       <div>
         <h3><a href="demos/gato-visualizer/">gato_visualizer: the TIAGo MPC in the browser</a></h3>
         <div class="meta">Solo, with AI coding agents · 2026</div>
-        <ul class="tech" aria-label="Languages and tools"><li>JavaScript</li><li>three.js</li><li>Vite</li><li>Python</li><li>Playwright</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>three.js</li><li>JavaScript</li><li>Python</li><li>Playwright</li></ul>
         <div class="links">
-          <a href="demos/gato-visualizer/">live demo</a>
+          <a href="demos/gato-visualizer/">live demo (≈ 15 MB)</a>
           <a href="https://github.com/felixmueh/gato_visualizer">code</a>
         </div>
         <p>A local web app that renders the TIAGo in 3D, runs the MPC live, replays recorded runs and exports animations. Built in about three days almost entirely by AI coding agents, with Playwright tests.</p>
@@ -89,17 +89,16 @@
       <div>
         <h3>Simulation automation at Mercedes-Benz</h3>
         <div class="meta">Working student · 2021–2023</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>Abaqus/CAE</li><li>JSON Schema</li><li>Sphinx</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>Abaqus/CAE</li><li>FEM simulation</li><li>geometry algorithms</li></ul>
         <p>As a working student in e-motor series development I designed and implemented a Python framework that automates finite-element simulations of electric motors in Abaqus/CAE, and coordinated the programming work in a five-person team. It made the end-to-end validation of supplier parts complete for the first time and cut it from several weeks to about one week.</p>
       </div>
     </article>
     <article class="row">
-      <!-- TODO(felix): still: Java method in → generated JML “determines” contract out -->
-      <div class="ph todo">still: Java method in → generated JML “determines” contract out</div>
+      <div class="still"><img src="media/sflow/sflow.jpg" alt="Type system meets theorem prover"></div>
       <div>
         <h3><a href="https://github.com/felixmueh/sflow-key-translation-layer">Type system meets theorem prover</a></h3>
         <div class="meta">Bachelor's thesis, KIT · 2023</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Java</li><li>Checker Framework</li><li>JML</li><li>KeY</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>formal verification</li><li>type systems</li><li>Java</li><li>KeY</li><li>JML</li><li>static analysis</li></ul>
         <div class="links">
           <a href="https://github.com/felixmueh/sflow-key-translation-layer">code</a>
           <a href="files/Muehlenberend_BSc-Thesis.pdf">thesis PDF (0.8 MB)</a>
@@ -112,7 +111,7 @@
       <div>
         <h3><a href="https://felixmueh.github.io/dice-web/">dice: a language for exact dice probabilities</a></h3>
         <div class="meta">Solo · 2020–2026</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>JavaScript</li><li>Pyodide</li><li>pytest</li><li>Playwright</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>parsers &amp; interpreters</li><li>JavaScript</li><li>Pyodide (WebAssembly)</li><li>pytest</li><li>Playwright</li></ul>
         <div class="links">
           <a href="https://felixmueh.github.io/dice-web/">live demo (≈ 6 MB)</a>
           <a href="https://github.com/felixmueh/dice">code</a>
@@ -125,7 +124,7 @@
       <div>
         <h3><a href="https://github.com/felixmueh/RT-Rendering_ReSTIR">ReSTIR real-time lighting</a></h3>
         <div class="meta">Course project, team of 2 · 2024–2025</div>
-        <ul class="tech" aria-label="Languages and tools"><li>C++</li><li>OpenGL</li><li>GLSL compute shaders</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>real-time rendering</li><li>C++</li><li>OpenGL</li><li>GLSL</li><li>compute shaders</li></ul>
         <div class="links">
           <a href="https://github.com/felixmueh/RT-Rendering_ReSTIR">code</a>
         </div>
@@ -135,11 +134,11 @@
     <article class="row">
       <div class="clip"><video loop muted playsinline preload="metadata" poster="media/windsurf/windsurf.jpg" aria-label="Clip: Windsurf video analysis"><source src="media/windsurf/windsurf.webm" type="video/webm"><source src="media/windsurf/windsurf.mp4" type="video/mp4"></video></div>
       <div>
-        <h3><a href="https://github.com/BertilBraun/Windsurf-Analysis">Windsurf video analysis</a></h3>
+        <h3><a href="https://github.com/BertilBraun/Windsurf-Analysis/tree/49e0e56">Windsurf video analysis</a></h3>
         <div class="meta">Prototype with Bertil Braun · 2025</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>YOLO11</li><li>BoT-SORT</li><li>OpenCV</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>computer vision</li><li>Python</li><li>YOLO (ultralytics)</li><li>multi-object tracking</li><li>OpenCV</li></ul>
         <div class="links">
-          <a href="https://github.com/BertilBraun/Windsurf-Analysis">code (Bertil Braun's repo)</a>
+          <a href="https://github.com/BertilBraun/Windsurf-Analysis/tree/49e0e56">code (Bertil Braun's repo)</a>
           <a href="https://github.com/felixmueh/ultralytics">ultralytics fork</a>
         </div>
         <p>Detects and tracks windsurfers in long videos and cuts them into stabilised clips, one per surfer: a six-day prototype together with Bertil Braun, whose output the clip shows. My share was re-identification features via a fork of ultralytics, branch-and-bound track stitching and the parallel processing pipeline.</p>
@@ -150,7 +149,7 @@
       <div>
         <h3>Epidemics on networks: SIS and SIR simulations in Rust</h3>
         <div class="meta">Course projects, UPC Barcelona · 2024</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Rust</li><li>Python</li><li>networkx</li><li>matplotlib</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Rust</li><li>Monte Carlo simulation</li><li>multithreading</li><li>Python</li><li>NetworkX</li></ul>
         <p>Two course projects from my Erasmus year: a Monte-Carlo SIS epidemic simulator in Rust on generated networks (Erdős–Rényi, Barabási–Albert, Watts–Strogatz, configuration model), compared with the MMCA theory of my teammate Jordi Canosa Casellas, and then an SIR simulation with “social distancing” rules that cap each person's contacts. I wrote most of the code, including the multithreaded Rust core.</p>
       </div>
     </article>
@@ -159,7 +158,7 @@
       <div>
         <h3><a href="https://github.com/felixmueh/mima-c">mima-c: a C subset for the MIMA teaching CPU</a></h3>
         <div class="meta">With Bertil Braun · 2021</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>parsers &amp; interpreters</li></ul>
         <div class="links">
           <a href="https://github.com/felixmueh/mima-c">code (my Python version)</a>
           <a href="https://bertilbraun.github.io/mima-c/">web demo by Bertil Braun</a>
@@ -172,7 +171,7 @@
       <div>
         <h3>Mannys World Theory</h3>
         <div class="meta">Team project, lead developer · 2019</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Unity</li><li>C#</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Unity</li><li>C#</li><li>game development</li></ul>
         <p>A 2D physics puzzle game in which the player character's corpses become tools for solving the levels. As lead developer I wrote about 98% of the code: character controller, physics and teleporter mechanics, with pull requests and issues in Git.</p>
       </div>
     </article>
@@ -181,7 +180,7 @@
       <div>
         <h3>Formula 1 in Schools: CAD design of a model race car</h3>
         <div class="meta">Car designer, school team of 6 · 2014–2016</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Solid Edge</li><li>Siemens NX</li><li>CFD</li><li>CNC milling</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>3D CAD</li><li>Siemens NX</li><li>Solid Edge</li><li>CFD</li><li>CNC milling</li></ul>
         <p>Not software: for a school competition I designed our team's model race car in 3D CAD, optimised it with CFD and wind-tunnel tests and had it CNC-machined. German runner-up 2015 with the fastest car and 8th at the 2015 World Finals in Singapore. Afterwards I supervised team Endeavour on its way to the 2016 World Finals in Austin.</p>
       </div>
     </article>
@@ -190,7 +189,7 @@
       <div>
         <h3><a href="https://github.com/felixmueh/Code4Fun">Code4Fun: early coding experiments</a></h3>
         <div class="meta">Solo · 2018–2019</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>NumPy</li><li>Numba</li><li>pygame</li><li>matplotlib</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>NumPy</li><li>Numba</li><li>numerical simulation</li><li>pygame</li></ul>
         <div class="links">
           <a href="https://github.com/felixmueh/Code4Fun">Code4Fun</a>
           <a href="https://github.com/felixmueh/My12Steps">12 Steps to Navier–Stokes</a>
@@ -204,7 +203,7 @@
       <div>
         <h3>Advent of Code</h3>
         <div class="meta">Solo · 2022–2025</div>
-        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>Rust</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>Python</li><li>Rust</li><li>algorithms</li></ul>
         <p>Solutions to the 2015–2025 editions of the yearly programming puzzles, in Python and, for 2022, entirely in Rust. A helper library of my own covers the recurring graph and search algorithms.</p>
       </div>
     </article>
@@ -213,7 +212,7 @@
       <div>
         <h3><a href="https://github.com/felixmueh/TopDown_Shooter_OpenGl-Engine">A top-down shooter on my own C++/OpenGL engine</a></h3>
         <div class="meta">With Thomas Knippenberg · 2017</div>
-        <ul class="tech" aria-label="Languages and tools"><li>C++</li><li>OpenGL</li><li>GLSL</li><li>GLFW</li></ul>
+        <ul class="tech" aria-label="Languages and tools"><li>C++</li><li>OpenGL</li><li>GLSL</li><li>game development</li></ul>
         <div class="links">
           <a href="https://github.com/felixmueh/TopDown_Shooter_OpenGl-Engine">code</a>
         </div>
@@ -234,17 +233,17 @@
   <ul class="more-projects">
     <li>
       <h3>findme: search for a large media library</h3>
-      <div class="meta">Solo, with AI coding agents · 2026 · Python, FastAPI, SQLite, tantivy, Svelte, TypeScript, Docker</div>
+      <div class="meta">Solo, with AI coding agents · 2026 · Python, FastAPI, Svelte, SQLite, full-text search</div>
       <p>Self-hosted fuzzy search over thousands of tabletop-game images and audio files, tuned against an evaluation set.</p>
     </li>
     <li>
       <h3>emacs-todoist: two-way sync between Org mode and Todoist</h3>
-      <div class="meta">Solo, with AI coding agents · 2026 · Emacs Lisp, Todoist Sync API, ERT</div>
+      <div class="meta">Solo, with AI coding agents · 2026 · Emacs Lisp, Todoist API, unit testing</div>
       <p>Syncs Org mode TODO items and Todoist both ways, with conflict detection and about 260 ERT tests.</p>
     </li>
     <li>
       <h3>Embedded projects: standing-desk controller, EEPROM programmer, gadgets</h3>
-      <div class="meta">Solo · 2018–2026 · C++, Arduino, ESP32, I2C, Python</div>
+      <div class="meta">Solo · 2018–2026 · C++, Arduino, ESP32, I2C, PID control</div>
       <p>DIY standing-desk firmware (three Arduinos over I2C, PID levelling, collision detection), an EEPROM programmer and ESP32 gadgets.</p>
     </li>
     <li>
@@ -254,7 +253,7 @@
     </li>
     <li>
       <h3>A mini Prolog in Rust</h3>
-      <div class="meta">Solo · 2023 · Rust, declarative macros</div>
+      <div class="meta">Solo · 2023 · Rust, logic programming, declarative macros</div>
       <p>Facts and rules as declarative macros, unification and lazy SLD resolution. Unfinished: the parser is a stub.</p>
     </li>
   </ul>
