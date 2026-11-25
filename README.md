@@ -101,7 +101,7 @@ Before committing, check that `git ls-files data` prints nothing.
 
 ### The CV PDFs
 
-The home page header links two CVs, `CV: Deutsch · English`:
+The home page header links two CVs, `CV (DE)` and `CV (EN)`:
 `files/Muehlenberend-Felix_Lebenslauf.pdf` (German) and
 `files/Muehlenberend-Felix_CV.pdf` (English, built from `cv/jobs/_public`;
 how to rebuild and copy it: that job.yaml). 404.html links them too. Both
