@@ -132,12 +132,12 @@ code { font-family: var(--mono); font-size: 0.9em; }
    ------------------------------------------------------------------------------ */
 .home-header {
   display: grid;
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 1fr 260px;   /* bigger photo next to the three-paragraph intro (Felix, 25.11.2026) */
   grid-template-areas: "name photo" "bio photo";
   gap: 0 2rem; align-items: center;
   margin: 2.5rem 0 1rem;
 }
-.home-header .photo { grid-area: photo; width: 200px; }
+.home-header .photo { grid-area: photo; width: 260px; }
 .home-header .name { grid-area: name; text-align: center; }
 .home-header .bio { grid-area: bio; }
 .home-header h1 { font-size: 2rem; font-weight: 400; margin: 0 0 0.4rem; }
@@ -198,12 +198,12 @@ code { font-family: var(--mono); font-size: 0.9em; }
   body { font-size: 15px; }
 
   .home-header {
-    grid-template-columns: 96px 1fr;
+    grid-template-columns: 120px 1fr;
     grid-template-areas: "photo name" "bio bio";
     gap: 0.75rem 1rem;
     margin: 1.25rem 0 0.5rem;
   }
-  .home-header .photo { width: 96px; font-size: 0.65rem; }
+  .home-header .photo { width: 120px; font-size: 0.65rem; }
   .home-header .name { text-align: left; }
   .home-header h1 { font-size: 1.6rem; }
   .home-header .name .links { justify-content: flex-start; margin-bottom: 0; }
