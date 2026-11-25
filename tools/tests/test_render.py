@@ -32,7 +32,8 @@ def site(tmp_path) -> Path:
     """A copy of the site; data/ holds copies of the linked files, not the links
     (a relative symlink would point nowhere from the temp folder)."""
     copy = tmp_path / "site"
-    # Only what render.py reads and writes: the pages, data/ and tools/.
+    # Only what render.py reads and writes: index.html, data/ and tools/
+    # (the other pages come along and are checked by the privacy test too).
     # build/ and target/ hold raw recordings (GBs) and media/ the clips;
     # copying them into tmp_path (RAM-backed /tmp) once filled the tmpfs.
     # Rows whose media are missing in the copy only warn (render.row_media).
@@ -93,13 +94,16 @@ def test_no_private_person_field_reaches_any_page(site):
                 assert value not in digits, f"{page.name} contains the phone number"
 
 
-def test_the_public_cv_pdf_has_no_private_field():
-    """The CV page's PDF (files/Muehlenberend-Felix_CV.pdf) is built in the
-    Bewerbung repo (cv/jobs/_public) and copied here by hand, so check the
-    copy that gets published, not the build: pdftotext over the real file,
-    against the real `person` values."""
-    pdf = SITE / "files" / "Muehlenberend-Felix_CV.pdf"
-    assert pdf.is_file(), "cv.html links files/Muehlenberend-Felix_CV.pdf, which is missing"
+# The home page header links both CV PDFs. They are built in the Bewerbung
+# repo (the English one from cv/jobs/_public) and copied here by hand, so
+# check the copies that get published, not the builds. The German one fails
+# as missing until its first copy is in files/: on purpose, the header
+# already links it.
+@pytest.mark.parametrize("name", ["Muehlenberend-Felix_Lebenslauf.pdf", "Muehlenberend-Felix_CV.pdf"])
+def test_the_public_cv_pdfs_have_no_private_field(name):
+    """pdftotext over the real file, against the real `person` values."""
+    pdf = SITE / "files" / name
+    assert pdf.is_file(), f"index.html links files/{name}, which is missing"
     person = yaml.safe_load((SITE / "data" / "cv.yaml").read_text(encoding="utf-8"))["person"]
     text = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True,
                           check=True).stdout
@@ -108,21 +112,10 @@ def test_the_public_cv_pdf_has_no_private_field():
 
     for value in private_values(person):
         if value.isdigit():
-            assert value not in digits, "the public CV PDF contains the phone number"
+            assert value not in digits, f"{name} contains the phone number"
         elif not value.startswith("../"):   # photo/signature paths aren't text
-            assert value not in flat, f"the public CV PDF contains private data: {value!r}"
+            assert value not in flat, f"{name} contains private data: {value!r}"
     assert person["email"] in flat and "github.com/felixmueh" in flat
-
-
-def test_confidential_lines_are_skipped(site):
-    data = yaml.safe_load((site / "data" / "cv.yaml").read_text(encoding="utf-8"))
-    mercedes = next(e for e in data["entries"] if e["id"] == "mercedes")
-    secret = mercedes["lines"][0]
-    secret["tags"] = ["confidential"]
-    (site / "data" / "cv.yaml").write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
-
-    assert run_render(site).returncode == 0
-    assert secret["en"] not in (site / "cv.html").read_text(encoding="utf-8")
 
 
 # ==============================================================================

@@ -142,6 +142,9 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .home-header .bio { grid-area: bio; }
 .home-header h1 { font-size: 2rem; font-weight: 400; margin: 0 0 0.4rem; }
 .home-header .name .links { justify-content: center; margin-bottom: 0.8rem; }
+/* "CV: Deutsch · English" wraps as one unit, so a phone never splits it
+   across two lines. */
+.cv-links { white-space: nowrap; }
 
 /* ------------------------------------------------------------------------------
    Project rows (Barron): clip left, text right
@@ -187,18 +190,6 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .numbers div { border-left: 3px solid var(--link); padding-left: 0.75rem; font-size: 0.88rem; color: var(--muted); }
 
 /* ------------------------------------------------------------------------------
-   CV page
-   ------------------------------------------------------------------------------ */
-.cv h1 { font-size: 1.9rem; margin: 2rem 0 0.2rem; }
-.cv-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 1rem; }
-.cv-entry { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0 1.25rem; margin-bottom: 1rem; }
-.cv-entry .when { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-.cv-entry ul { margin: 0.25rem 0 0; padding-left: 1.1rem; font-size: 0.93rem; }
-.cv-entry .org { color: var(--muted); }
-.cv h2 { border-bottom: 1px solid var(--rule); padding-bottom: 0.3rem; }
-.pdf-btn { border: 1px solid var(--link); border-radius: 4px; padding: 0.3rem 0.8rem; }
-
-/* ------------------------------------------------------------------------------
    Phone width. The home header shrinks to a 96 px photo beside the name and
    links, so the first project row starts on the first screen (390×844).
    ------------------------------------------------------------------------------ */
@@ -223,7 +214,6 @@ code { font-family: var(--mono); font-size: 0.9em; }
   .row.key { padding: 0.6rem; }
   .more-projects { padding: 0; }
   .mini-timeline li { grid-template-columns: 1fr; gap: 0; }
-  .cv-entry { grid-template-columns: 1fr; }
   .facts { grid-template-columns: 1fr; }
   .facts dd { margin-bottom: 0.4rem; }
 }

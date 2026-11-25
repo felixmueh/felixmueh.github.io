@@ -3,28 +3,30 @@
 
     python3 tools/render.py
 
-Inputs:  data/cv.yaml, data/presets.yaml: git-ignored symlinks into the
-         Bewerbung repo (cv/data/), see README.md "Content from cv.yaml".
+Input:   data/cv.yaml: a git-ignored symlink into the Bewerbung repo
+         (cv/data/), see README.md "Content from cv.yaml".
 Outputs: index.html  the project rows, between
                      <!-- BEGIN generated: projects --> and <!-- END generated: projects -->,
                      and the "More projects" list, between
                      <!-- BEGIN generated: more-projects --> and <!-- END generated: more-projects -->
-         cv.html     the CV body, between
-                     <!-- BEGIN generated: cv --> and <!-- END generated: cv -->
 Everything outside the markers stays hand-written and is left alone.
 
 The CV data is the single source for the PDF CV and this site
 (docs/cv-decisions.md "Website" in the Bewerbung repo). Project rows come
-from the `web:` blocks of its entries (schema: cv/README.md there); the CV
-page follows the PDF CV's default layout (data/presets.yaml) with the
-`general` project preset, in English.
+from the `web:` blocks of its entries (schema: cv/README.md there), in
+English.
+
+Deliberately not rendered: the CV itself. The site had an HTML CV page
+(cv.html) generated here until 25.11.2026; Felix replaced it with links to
+the PDF CVs in German and English (files/), which are built in the
+Bewerbung repo and copied here by hand.
 
 Privacy: cv.yaml's `person` holds address, phone, private e-mail and date
 of birth, and GitHub Pages publishes everything committed. This script
 takes nothing from `person` at all (name, GitHub and LinkedIn would be
-allowed, but the page headers that show them are hand-written), and it
-skips lines tagged `confidential`. tools/tests/test_render.py checks that
-no private `person` value reaches any page.
+allowed, but the page headers that show them are hand-written).
+tools/tests/test_render.py checks that no private `person` value reaches
+any page.
 
 No fallback (Felix's rule): if the data is missing or malformed, the
 script stops with a message and writes nothing. There is no cached copy.
@@ -43,8 +45,6 @@ from markupsafe import Markup
 ROOT = Path(__file__).resolve().parent.parent  # the site repo
 DATA = ROOT / "data"
 LANG = "en"                 # the site is English only for now
-# TODO: a German version of the CV page, if Felix wants one (website-tasks.org, "Language").
-CV_PROJECT_PRESET = "general"
 
 
 class RenderError(Exception):
@@ -327,88 +327,6 @@ MORE_TEMPLATE = """\
 
 
 # ==============================================================================
-# CV body (cv.html)
-# ==============================================================================
-# The PDF CV's default layout: sections in presets.yaml order, each entry's
-# default lines. Entries of type "entry" are date | title · org, place with a
-# list of lines; type "item" is label | lines joined by " · " (skills,
-# languages), or a plain paragraph when the label is empty (interests).
-def cv_sections(data: dict, presets: dict) -> list[dict]:
-    entries = {e["id"]: e for e in data.get("entries") or []}
-    section_titles = data.get("sections") or {}
-    projects = (presets.get("projects") or {}).get(CV_PROJECT_PRESET)
-    if projects is None:
-        raise RenderError(f"presets.yaml: no project preset {CV_PROJECT_PRESET!r}")
-
-    sections = []
-    for item in presets.get("layout") or []:
-        # A bare name is the job-written Kurzprofil; a job's text has no place
-        # on the site, whose bio is hand-written in index.html.
-        if isinstance(item, str):
-            continue
-        (sec_id, ids), = item.items()
-        ids = projects if ids == "$projects" else ids
-        models = []
-        for eid in ids:
-            if eid not in entries:
-                raise RenderError(f"presets.yaml layout/{sec_id}: unknown entry {eid!r}")
-            e = entries[eid]
-            lines_by_id = {l["id"]: l for l in e.get("lines") or []}
-            selected = e["default"] if "default" in e else list(lines_by_id)
-            lines = []
-            for lid in selected:
-                line = lines_by_id[lid]
-                # Internal Mercedes-Benz details never go on a public page.
-                if "confidential" in (line.get("tags") or []):
-                    continue
-                value = line.get("text")
-                if value is None:
-                    value = {k: line[k] for k in ("de", "en") if k in line}
-                lines.append(to_html(pick(value, f"{eid}/{lid}")))
-            model = {"type": e.get("type", "entry"), "lines": lines}
-            if model["type"] == "entry":
-                org = ", ".join(x for x in (pick(e.get("org"), f"{eid}.org", required=False),
-                                            pick(e.get("place"), f"{eid}.place", required=False)) if x)
-                model.update(date=to_html(pick(e.get("date"), f"{eid}.date", required=False)),
-                             title=to_html(pick(e.get("title"), f"{eid}.title")),
-                             org=to_html(org) if org else "")
-            else:
-                model["label"] = to_html(pick(e.get("label"), f"{eid}.label", required=False))
-            models.append(model)
-        sections.append({"title": to_html(pick(section_titles.get(sec_id), f"sections.{sec_id}")),
-                         "entries": models})
-    return sections
-
-
-CV_TEMPLATE = """\
-{% for s in sections %}
-  <h2>{{ s.title }}</h2>
-{%- for e in s.entries %}
-{%- if e.type == 'entry' %}
-  <div class="cv-entry">
-    <div class="when">{{ e.date }}</div>
-    <div>
-      <strong>{{ e.title }}</strong>{% if e.org %} <span class="org">· {{ e.org }}</span>{% endif %}
-{%- if e.lines %}
-      <ul>
-{%- for l in e.lines %}
-        <li>{{ l }}</li>
-{%- endfor %}
-      </ul>
-{%- endif %}
-    </div>
-  </div>
-{%- elif e.label %}
-  <div class="cv-entry"><div class="when">{{ e.label }}</div><div>{{ e.lines|join(' · ') }}</div></div>
-{%- else %}
-  <p>{{ e.lines|join(' · ') }}</p>
-{%- endif %}
-{%- endfor %}
-{%- endfor %}
-"""
-
-
-# ==============================================================================
 # Writing between the markers
 # ==============================================================================
 GENERATED_NOTE = ("<!-- Generated by tools/render.py from data/cv.yaml (the Bewerbung repo's "
@@ -429,24 +347,18 @@ def splice(page: str, name: str, body: str) -> str:
 def main() -> int:
     try:
         data = load("cv.yaml")
-        presets = load("presets.yaml")
         env = jinja2.Environment(autoescape=True, keep_trailing_newline=True)
         main_rows, more_rows = split_sections(project_rows(data))
         rows = env.from_string(ROWS_TEMPLATE).render(rows=main_rows)
         more = env.from_string(MORE_TEMPLATE).render(rows=more_rows)
-        cv = env.from_string(CV_TEMPLATE).render(sections=cv_sections(data, presets))
-        # Render both pages before writing either, so an error leaves both untouched.
+        # Splice both lists before writing, so an error leaves the page untouched.
         index = splice((ROOT / "index.html").read_text(encoding="utf-8"), "projects", rows)
-        pages = {
-            "index.html": splice(index, "more-projects", more),
-            "cv.html": splice((ROOT / "cv.html").read_text(encoding="utf-8"), "cv", cv),
-        }
+        index = splice(index, "more-projects", more)
     except RenderError as e:
         print(f"render.py: {e}", file=sys.stderr)
         return 1
-    for name, text in pages.items():
-        (ROOT / name).write_text(text, encoding="utf-8")
-        print(f"rendered: {name}")
+    (ROOT / "index.html").write_text(index, encoding="utf-8")
+    print("rendered: index.html")
     return 0
 
 

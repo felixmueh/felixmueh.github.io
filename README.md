@@ -1,15 +1,18 @@
 # felix-muehlenberend.de
 
 Personal website of Felix Mühlenberend: a short bio, his projects with silent
-looping clips (each with its own page), an HTML CV and a legal page. Plain
-static HTML and CSS with one small script (`site.js`, pause controls for the
-clips). No build step on the server: the project rows and the CV body are
-rendered into the HTML from Felix's CV data before committing (below).
+looping clips (each with its own page), links to his CV as PDF (German and
+English) and a legal page. Plain static HTML and CSS with one small script
+(`site.js`, pause controls for the clips). No build step on the server: the
+project rows are rendered into the HTML from Felix's CV data before
+committing (below).
 Served by GitHub Pages from the root of `main`.
 
 Pages: `index.html` (Home), `projects/*.html` (one page per project),
-`cv.html`, `legal.html` (Impressum / Datenschutz), `404.html` (served by
-GitHub Pages for any missing path, so it uses root-relative paths).
+`legal.html` (Impressum / Datenschutz), `404.html` (served by GitHub Pages
+for any missing path, so it uses root-relative paths). `files/` holds the
+PDFs: both CVs (below) and the theses. There is no HTML CV page: Felix
+replaced `cv.html` with the two PDF links on 25.11.2026.
 `demos/` holds self-contained browser demos (the gato_visualizer replay).
 The home page has no nav bar (its header holds the name and the links),
 and each subpage has one small link back home.
@@ -55,17 +58,13 @@ and `files/` that no page uses, with the total size.
 
 ## Content from cv.yaml
 
-The project rows on the home page and the body of the CV page are generated
-from Felix's CV data in the Bewerbung repo (`cv/data/cv.yaml`), the same
-file the PDF CV is built from:
+The project rows on the home page (the main list and "More projects") are
+generated from Felix's CV data in the Bewerbung repo (`cv/data/cv.yaml`),
+the same file the PDF CVs are built from: one row per entry with a `web:`
+block (order, section, title, meta line, summary, clip, links; schema in
+that repo's `cv/README.md`).
 
-- **project rows** (`index.html`): one per entry with a `web:` block
-  (order, title, meta line, summary, clip, links; schema in that repo's
-  `cv/README.md`);
-- **CV body** (`cv.html`): the PDF CV's default layout
-  (`cv/data/presets.yaml`) with the `general` projects, in English.
-
-**Edit project and CV text in Bewerbung's `cv.yaml`, never in the HTML
+**Edit project text in Bewerbung's `cv.yaml`, never in the HTML
 between the markers** `<!-- BEGIN generated: … -->` / `<!-- END generated:
 … -->`: the next render overwrites it. Everything outside the markers
 (header with the contact links, bio, timeline) is hand-written. Then:
@@ -73,19 +72,18 @@ between the markers** `<!-- BEGIN generated: … -->` / `<!-- END generated:
     python3 tools/render.py
 
 (Python 3 with PyYAML and Jinja2, the CV generator's libraries.) Commit the
-re-rendered pages.
+re-rendered `index.html`.
 
 ### Setup on a new machine
 
-The script reads the data through two symlinks in `data/`, relative to
+The script reads the data through a symlink in `data/`, relative to
 this repo, so both repos must sit where they do here
 (`~/_Projects/felixmueh.github.io` and `~/_Documents/Bewerbung`):
 
     mkdir -p data
     ln -s ../../../_Documents/Bewerbung/cv/data/cv.yaml data/cv.yaml
-    ln -s ../../../_Documents/Bewerbung/cv/data/presets.yaml data/presets.yaml
 
-Without them `tools/render.py` stops with a message; there is no cached
+Without it `tools/render.py` stops with a message; there is no cached
 copy to fall back on.
 
 ### Privacy: why `data/` is never committed
@@ -94,20 +92,23 @@ copy to fall back on.
 and GitHub Pages publishes everything committed to this repo. So `data/`
 is in `.gitignore`, and the script takes nothing from `person` (name,
 e-mail, GitHub and LinkedIn are public; the headers that show them are
-hand-written) and skips lines tagged `confidential`. The CV page
-deliberately leaves out street address, phone, date of birth and photo.
-`tools/tests/test_render.py` renders with the real data and fails if any
-private `person` value reaches a page:
+hand-written). `tools/tests/test_render.py` renders with the real data and
+fails if any private `person` value reaches a page:
 
     python3 -m pytest tools/tests    # any Python with pytest, PyYAML, Jinja2
 
 Before committing, check that `git ls-files data` prints nothing.
 
-The CV page's PDF, `files/Muehlenberend-Felix_CV.pdf`, is built in the
-Bewerbung repo from `cv/jobs/_public` (English, no address, phone, birth
-date, photo or signature; how to rebuild and copy it: that job.yaml). The
-same test file checks the copy here with pdftotext against the private
-`person` values.
+### The CV PDFs
+
+The home page header links two CVs, `CV: Deutsch · English`:
+`files/Muehlenberend-Felix_Lebenslauf.pdf` (German) and
+`files/Muehlenberend-Felix_CV.pdf` (English, built from `cv/jobs/_public`;
+how to rebuild and copy it: that job.yaml). 404.html links them too. Both
+are built in the Bewerbung repo without address, phone, birth date, photo
+or signature, and copied here by hand after a `cv.yaml` change. The same
+test file checks both copies with pdftotext against the private `person`
+values, and fails while one of them is missing.
 
 ## Layout prototype
 
