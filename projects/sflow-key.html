@@ -7,14 +7,9 @@
   Facts: the thesis (files/Muehlenberend_BSc-Thesis.pdf), and in the Bewerbung repo
   docs/cv-pool/education-work.md §2.1, docs/projects.md (sflow-key-translation-layer)
   and docs/website/audits/sflow.md (where the commits sit in the fork).
-  Both code examples are from the thesis: §2.1 (implicit flow, names changed) and
-  Figure 5.3 (false positive, shortened: the call to a @TaintedMethod logger and the
-  comments are left out, they don't change the point).
--->
-<!--
-  The still is the one from the home page row: the code panes of the "Example
-  Translation" slide in Felix's bachelor's presentation, redrawn (no caption about
-  its source, Felix 25.11.2026).
+  Both code examples are from the thesis: Figure 4.10 (implicit flow through break,
+  the page's opening example instead of a picture, Felix 25.11.2026) and Figure 5.3
+  (false positive, in full with the call to a @TaintedMethod, comments left out).
 -->
 <html lang="en">
 <head>
@@ -33,10 +28,16 @@
   <h1>Type system meets theorem prover</h1>
   <div class="meta">Bachelor's thesis, KIT, 2023 · solo · Java, Checker Framework, JML, KeY</div>
 
-  <div class="hero">
-    <div class="still"><img src="../media/sflow/sflow.jpg" width="960" height="540" alt="Two code panes. Left, the input: a Java method that assigns a @Tainted parameter to a public field. Right, the output: the same method with a JML determines clause above it and the comment Verify this method."></div>
-  </div>
-  <p class="caption">What the translation layer writes for a method that the type checker rejects: the same Java with a JML contract for KeY and a note on which method to verify.</p>
+  <p>Nothing tainted is ever assigned to <code>y</code> in this loop, and still it leaks the secret:</p>
+<pre><code>@Tainted int x = 5;
+@Safe int y = 0;
+for (@Safe int i = 0; i &lt; 10; i++) {
+    if (x &gt;= 5) {
+        break;
+    }
+    y = i;
+}</code></pre>
+  <p>The loop stops early exactly when <code>x &gt;= 5</code>, so afterwards <code>y</code> is 0 or 9 and gives the secret away. For my bachelor's thesis I extended the type checker SFlow to catch flows like this one, and combined it with the theorem prover KeY for secure programs that the type checker still rejects.</p>
 
   <dl class="facts">
     <dt>Title</dt><dd>A Translation Layer for Information Flow Verification Systems: Bridging Type Systems with Theorem Provers</dd>
@@ -46,14 +47,7 @@
   </dl>
 
   <h2>Problem</h2>
-  <p>Information-flow control proves that secret data can't reach public outputs, or that untrusted input can't change trusted data. A flow can be explicit, an assignment, or implicit, through control flow:</p>
-<pre><code>@Tainted int secret;
-@Safe int visible = 1;
-
-if (secret == 0) {
-    visible = 0;
-}</code></pre>
-  <p>No secret value is assigned to <code>visible</code>, but afterwards it tells whether <code>secret</code> is 0.</p>
+  <p>Information-flow control proves that secret data can't reach public outputs, or that untrusted input can't change trusted data. A flow can be explicit, an assignment, or implicit, through control flow, as in the loop above.</p>
   <p>Type systems such as SFlow check annotations like these automatically, but they are conservative and reject some programs that leak nothing. SFlow also left out implicit flows, like most practical type systems, because the rules that forbid them are very restrictive. The theorem prover KeY proves the absence of flows precisely, but it needs a JML contract for every method and can need help from the user during a proof.</p>
 
   <h2>Approach</h2>
@@ -73,14 +67,15 @@ if (secret == 0) {
 <pre><code>@SafeMethod
 public void noImplicitFlow() {
     try {
-        if (logDeletion) {  // @Tainted
+        if (logDeletion) {              // @Tainted
             safeValue = safeValue * 100;
+            safelyLog();                // @TaintedMethod
         }
     } finally {
         safeValue = 0;
     }
 }</code></pre>
-  <p>The safe field changes in a branch on a tainted condition, but the <code>finally</code> block resets it. KeY proves that.</p>
+  <p>Calling <code>safelyLog()</code> in the tainted branch is fine, because its method type says it writes no safe variables. The safe field itself changes in that branch, so the type checker rejects the method, but the <code>finally</code> block resets it. KeY proves that.</p>
   <ul>
     <li>Most test cases needed few type annotations and little interaction with KeY.</li>
     <li>Where a real leak exists, the combined system still points to the code that causes it, even when the KeY proof stays incomplete.</li>
