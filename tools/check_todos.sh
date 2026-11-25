@@ -10,8 +10,15 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # All pages, including untracked ones (a new page is exactly where a stray
-# placeholder hides). --exclude-dir keeps other worktrees out.
-search() { grep -r -n -o --include='*.html' --exclude-dir=.worktrees --exclude-dir=.git "$@" . | sed 's|^\./||'; }
+# placeholder hides). Skipped: other worktrees and .git; build/ and target/
+# (raw material and test copies: pytest's copies of the site there repeat
+# every page's placeholders); media/ and files/ (clips and PDFs, no pages).
+search() {
+  grep -r -n -o --include='*.html' \
+    --exclude-dir=.worktrees --exclude-dir=.git --exclude-dir=build --exclude-dir=target \
+    --exclude-dir=media --exclude-dir=files \
+    "$@" . | sed 's|^\./||'
+}
 
 # One line per TODO(felix) comment: "page:line:text", sorted by page.
 items=$(search 'TODO(felix):[^>]*' | sed -E 's/ *--$//; s/TODO\(felix\): *//' | sort -t: -k1,1 -k2,2n || true)
