@@ -23,7 +23,9 @@ search() {
 # One line per TODO(felix) comment: "page:line:text", sorted by page.
 items=$(search 'TODO(felix):[^>]*' | sed -E 's/ *--$//; s/TODO\(felix\): *//' | sort -t: -k1,1 -k2,2n || true)
 # Elements carrying the class "todo" (class attribute containing the word).
-marked=$(search -E 'class="([^"]* )?todo( [^"]*)?"' | wc -l)
+# grep exits 1 when nothing matches, which pipefail turns into a failed
+# pipeline and set -e into a silent exit 1: `|| true`, as for the items above.
+marked=$(search -E 'class="([^"]* )?todo( [^"]*)?"' | wc -l || true)
 
 count=$(printf '%s' "$items" | grep -c . || true)
 if [ "$count" -eq 0 ] && [ "$marked" -eq 0 ]; then
