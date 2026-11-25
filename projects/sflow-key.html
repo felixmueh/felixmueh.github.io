@@ -1,0 +1,100 @@
+<!doctype html>
+<!--
+  Bachelor's thesis case study, built like projects/tiago-mpc.html:
+  problem → approach → result → own role (docs/guides/personal-website-demos.md §1.2
+  in the Bewerbung repo). Felix wanted this page instead of a link to the code
+  alone, because the code is a fork and hard to read (25.11.2026).
+  Facts: the thesis (files/Muehlenberend_BSc-Thesis.pdf), and in the Bewerbung repo
+  docs/cv-pool/education-work.md §2.1, docs/projects.md (sflow-key-translation-layer)
+  and docs/website/audits/sflow.md (where the commits sit in the fork).
+  Both code examples are from the thesis: §2.1 (implicit flow, names changed) and
+  Figure 5.3 (false positive, shortened: the call to a @TaintedMethod logger and the
+  comments are left out, they don't change the point).
+-->
+<!--
+  The still is the one from the home page row: the code panes of the "Example
+  Translation" slide in Felix's bachelor's presentation, redrawn (no caption about
+  its source, Felix 25.11.2026).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type system meets theorem prover · Felix Mühlenberend</title>
+<meta name="description" content="Bachelor's thesis: information-flow control for Java that combines the type checker SFlow with the theorem prover KeY.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="backlink column article" aria-label="Home"><a href="../index.html">← Felix Mühlenberend</a></nav>
+
+<main class="column article">
+  <h1>Type system meets theorem prover</h1>
+  <div class="meta">Bachelor's thesis, KIT, 2023 · solo · Java, Checker Framework, JML, KeY</div>
+
+  <div class="hero">
+    <div class="still"><img src="../media/sflow/sflow.jpg" width="960" height="540" alt="Two code panes. Left, the input: a Java method that assigns a @Tainted parameter to a public field. Right, the output: the same method with a JML determines clause above it and the comment Verify this method."></div>
+  </div>
+  <p class="caption">What the translation layer writes for a method that the type checker rejects: the same Java with a JML contract for KeY and a note on which method to verify.</p>
+
+  <dl class="facts">
+    <dt>Title</dt><dd>A Translation Layer for Information Flow Verification Systems: Bridging Type Systems with Theorem Provers</dd>
+    <dt>Where</dt><dd>KIT, Institute of Information Security and Dependability (KASTEL)</dd>
+    <dt>Supervision</dt><dd>Prof. Dr. Bernhard Beckert (advisor: Florian Lanzinger)</dd>
+    <dt>Links</dt><dd class="links"><a href="../files/Muehlenberend_BSc-Thesis.pdf">thesis PDF</a><a href="https://github.com/felixmueh/sflow-key-translation-layer">code</a></dd>
+  </dl>
+
+  <h2>Problem</h2>
+  <p>Information-flow control proves that secret data can't reach public outputs, or that untrusted input can't change trusted data. A flow can be explicit, an assignment, or implicit, through control flow:</p>
+<pre><code>@Tainted int secret;
+@Safe int visible = 1;
+
+if (secret == 0) {
+    visible = 0;
+}</code></pre>
+  <p>No secret value is assigned to <code>visible</code>, but afterwards it tells whether <code>secret</code> is 0.</p>
+  <p>Type systems such as SFlow check annotations like these automatically, but they are conservative and reject some programs that leak nothing. SFlow also left out implicit flows, like most practical type systems, because the rules that forbid them are very restrictive. The theorem prover KeY proves the absence of flows precisely, but it needs a JML contract for every method and can need help from the user during a proof.</p>
+
+  <h2>Approach</h2>
+  <p>The thesis combines the two, method by method. The type checker runs first and infers the missing types. Only the methods it rejects go to KeY. A similar combination existed for dependence graphs and KeY, not yet for a type system.</p>
+  <ul>
+    <li>Implicit flows: I extended SFlow with typing rules for conditionals, loops and the statements that change control flow (<code>break</code>, <code>continue</code>, <code>return</code>, <code>throw</code>).</li>
+    <li>Method types: two new annotations, <code>@SafeMethod</code> and <code>@TaintedMethod</code>, say whether a method may write safe variables. A call inside a branch on a secret is checked against the called method's type, not its body. An overriding method must be at least as strict as the one it overrides, so dynamic dispatch can't open a flow.</li>
+    <li>Translation layer: the checker writes the program back out as Java with JML contracts. Every method gets a <code>determines</code> clause (its safe outputs depend only on its safe inputs), methods typed tainted get an <code>assignable</code> clause that lists the only variables they may write, and each rejected method is marked as a proof obligation for KeY.</li>
+    <li>Soundness proof: I showed that the type system's notion of noninterference (Volpano and Smith) and KeY's are equivalent for the two security levels safe and tainted. From this I proved that the type system, extended with a rule that accepts a KeY proof for a method, is still sound.</li>
+  </ul>
+
+  <h2>Result</h2>
+  <div class="numbers">
+    <div><span class="figure-num">34</span><br>test cases, written test-first, for all typing rules and common Java constructs</div>
+  </div>
+  <p>If the extended SFlow can type every method of a program, the program is free of insecure flows, implicit ones included. Where it is too strict, KeY takes over. This example from the thesis is rejected by the type checker but leaks nothing:</p>
+<pre><code>@SafeMethod
+public void noImplicitFlow() {
+    try {
+        if (logDeletion) {  // @Tainted
+            safeValue = safeValue * 100;
+        }
+    } finally {
+        safeValue = 0;
+    }
+}</code></pre>
+  <p>The safe field changes in a branch on a tainted condition, but the <code>finally</code> block resets it. KeY proves that.</p>
+  <ul>
+    <li>Most test cases needed few type annotations and little interaction with KeY.</li>
+    <li>Where a real leak exists, the combined system still points to the code that causes it, even when the KeY proof stays incomplete.</li>
+    <li><strong>Not done:</strong> a more extensive case study of effectiveness and annotation overhead, which the thesis leaves as future work.</li>
+  </ul>
+
+  <h2>My role</h2>
+  <p>A solo bachelor's thesis: I did the proofs, the implementation, the tests and the writing. The code builds on SFlow by Huang, Dong and Milanova. My 46 commits from July and August 2023 are in <code>inference-framework/checker-framework/checkers/</code> of the fork.</p>
+</main>
+
+<footer class="site-footer">
+  <div class="column">© 2026 Felix Mühlenberend · <a href="../legal.html">Impressum / Datenschutz</a></div>
+</footer>
+
+<script src="../site.js"></script>
+</body>
+</html>
