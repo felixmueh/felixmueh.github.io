@@ -68,7 +68,7 @@
           <a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc (code)</a>
           <a href="https://github.com/felixmueh/MPCGPU">MPCGPU study (code)</a>
         </div>
-        <p>I ported the GPU trajectory optimiser GATO to the right arm of a TIAGo Pro and ran it as a model predictive controller on the robot's embedded NVIDIA Jetson AGX Orin, in simulation and on the physical arm. Solve times allow up to about 500 control updates per second, and GATO adopted the pull requests and issues I contributed along the way.</p>
+        <p>I ported the GPU trajectory optimiser GATO to the right arm of a TIAGo Pro as a model predictive controller on the robot's embedded NVIDIA Jetson AGX Orin, and evaluated it in simulation and on the physical arm. Solve times allow up to about 500 control updates per second, and GATO adopted the pull requests and issues I contributed along the way.</p>
       </div>
     </article>
     <article class="row">
@@ -81,7 +81,7 @@
           <a href="demos/gato-visualizer/">live demo (≈ 15 MB)</a>
           <a href="https://github.com/felixmueh/gato_visualizer">code</a>
         </div>
-        <p>A local web app that renders the TIAGo in 3D, runs the MPC live, replays recorded runs and exports animations. Built in about three days almost entirely by AI coding agents, with Playwright tests.</p>
+        <p>A browser visualisation of the TIAGo MPC (three.js) that renders the robot in 3D, runs the MPC live and replays recorded runs. I built it in about three days as an experiment with AI coding agents, backed by Playwright tests.</p>
       </div>
     </article>
     <article class="row">
@@ -116,7 +116,7 @@
           <a href="https://felixmueh.github.io/dice-web/">live demo (≈ 6 MB)</a>
           <a href="https://github.com/felixmueh/dice">code</a>
         </div>
-        <p>A small programming language with its own lexer, recursive-descent parser, interpreter and exact distribution engine, written by hand in 2020 and reworked in 2026 with AI coding agents. dice-web runs it entirely in the browser via Pyodide, with an editor, charts and shareable links.</p>
+        <p>A DSL for exact probability distributions with Python interop and parameter sweeps. Evaluation is fast through caching based on static side-effect analysis. My own lexer, parser and interpreter, running in the browser via Pyodide.</p>
       </div>
     </article>
     <article class="row">
@@ -141,7 +141,7 @@
           <a href="https://github.com/BertilBraun/Windsurf-Analysis/tree/49e0e56">code (Bertil Braun's repo)</a>
           <a href="https://github.com/felixmueh/ultralytics">ultralytics fork</a>
         </div>
-        <p>Detects and tracks windsurfers in long videos and cuts them into stabilised clips, one per surfer: a six-day prototype together with Bertil Braun, whose output the clip shows. My share was re-identification features via a fork of ultralytics, branch-and-bound track stitching and the parallel processing pipeline.</p>
+        <p>Detects and tracks windsurfers in long videos with a fine-tuned YOLO model and cuts them into stabilised clips, one per surfer. A prototype in a team of two with Bertil Braun. My share was re-identification features via a fork of ultralytics, branch-and-bound track stitching and the parallel processing pipeline.</p>
       </div>
     </article>
     <article class="row">
@@ -163,7 +163,7 @@
           <a href="https://github.com/felixmueh/mima-c">code (my Python version)</a>
           <a href="https://bertilbraun.github.io/mima-c/">web demo by Bertil Braun</a>
         </div>
-        <p>A C subset for MIMA, the teaching CPU of KIT's computer-engineering lectures. My part was the first version in Python: lexer, recursive-descent parser, AST and interpreter. Bertil Braun ported it to C#, wrote the compiler backend to MIMA assembly and the web demo.</p>
+        <p>A compiler and interpreter for a C subset on MIMA, the teaching CPU of KIT's computer-engineering lectures. I wrote the prototype in Python, with lexer, recursive-descent parser, interpreter and compiler backend. Bertil Braun wrote the C# port and the web demo.</p>
       </div>
     </article>
     <article class="row">
@@ -179,9 +179,9 @@
       <div class="clip"><video loop muted playsinline preload="metadata" poster="media/f1-in-schools/f1-in-schools.jpg" aria-label="Clip: Formula 1 in Schools: CAD design of a model race car"><source src="media/f1-in-schools/f1-in-schools.webm" type="video/webm"><source src="media/f1-in-schools/f1-in-schools.mp4" type="video/mp4"></video></div>
       <div>
         <h3>Formula 1 in Schools: CAD design of a model race car</h3>
-        <div class="meta">Car designer, school team of 6 · 2014–2016</div>
+        <div class="meta">Car designer, school team of 6 · 2014–2019</div>
         <ul class="tech" aria-label="Languages and tools"><li>3D CAD</li><li>Siemens NX</li><li>Solid Edge</li><li>CFD</li><li>CNC milling</li></ul>
-        <p>Not software: for a school competition I designed our team's model race car in 3D CAD, optimised it with CFD and wind-tunnel tests and had it CNC-machined. German runner-up 2015 with the fastest car and 8th at the 2015 World Finals in Singapore. Afterwards I supervised team Endeavour on its way to the 2016 World Finals in Austin.</p>
+        <p>Not software: for a school competition I designed our team's model race car in 3D CAD, optimised it with CFD and wind-tunnel tests and had it CNC-machined. German runner-up 2015 with the fastest car and 8th at the 2015 World Finals in Singapore. From 2016 to 2019 I supervised the school's F1 club weekly, supporting other teams' designers with CAD and teaching physics and aerodynamics. Teams “Endeavour” (German runner-up 2016, World Finals in Austin) and “Fusion” (3rd place at the 2019 World Finals in Abu Dhabi).</p>
       </div>
     </article>
     <article class="row">
