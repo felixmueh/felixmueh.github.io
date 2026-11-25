@@ -189,6 +189,31 @@ code { font-family: var(--mono); font-size: 0.9em; }
    phone scrolls inside the block, never the page. */
 .article pre { background: #f6f6f6; border-radius: 3px; padding: 0.6rem 0.8rem; margin: 0 0 0.8rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.45; }
 .article pre code { font-size: inherit; }
+.article h3 { margin-top: 1.3rem; }
+
+/* ------------------------------------------------------------------------------
+   Architecture diagram (the master's thesis page): an inline SVG, so its text
+   uses the page font and stays selectable. The box carries its own light
+   background and colours, so it reads the same whatever is around it. Below
+   ~690 px the drawing would shrink its text under 11 px, so it keeps a minimum
+   width and scrolls inside its box instead, never the page.
+   ------------------------------------------------------------------------------ */
+.diagram { margin: 1rem 0 0.4rem; overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.diagram svg { display: block; width: 100%; min-width: 660px; height: auto; color: #1a1a1a; }
+.diagram text { font-family: var(--font); font-size: 13px; fill: currentColor; }
+.diagram .small { font-size: 11.5px; fill: #5f6368; }
+.diagram .head { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; fill: #5f6368; }
+.diagram .title { font-weight: 600; }
+.diagram .band { fill: #f5f5f5; stroke: #d0d0d0; }
+.diagram .band-run { fill: #f2f6fb; stroke: #c9d6e6; }
+.diagram .proc { fill: #fff; stroke: #8a9199; }
+.diagram .gpu { fill: #eef1f5; stroke: none; }
+.diagram .new { fill: #e6eff9; stroke: #1a5fb4; stroke-width: 1.4; }
+.diagram .mod { fill: #fff; stroke: #1a5fb4; stroke-width: 1.4; stroke-dasharray: 5 3; }
+.diagram .used { fill: #efefef; stroke: #9a9a9a; }
+.diagram .out { fill: #fff; stroke: #b5b5b5; }
+.diagram .flow { fill: none; stroke: #4a4f55; stroke-width: 1.3; }
+.diagram .arrowhead { fill: #4a4f55; }
 
 /* ------------------------------------------------------------------------------
    Phone width. The home header shrinks to a 96 px photo beside the name and

@@ -1,9 +1,13 @@
 <!doctype html>
 <!--
-  Thesis case study. Order: problem → approach → result → own role
-  (docs/guides/personal-website-demos.md §1.2 in the Bewerbung repo).
-  Facts: docs/cv-pool/education-work.md §2.2 (thesis), docs/projects.md (GATO pull requests and issues).
-  GATO wording (Felix, 25.11.2026): "contributions (pull requests and issues)", no counts.
+  Master's thesis case study, written from a software-engineering angle (Felix, 25.11.2026):
+  opening with the result, how I built it (architecture diagram), my contributions to GATO,
+  results. The bachelor's thesis page (sflow-key.html) is its sibling.
+  Facts: the thesis (files/Muehlenberend_MSc-Thesis.pdf: Figure 12, §4.3, §4.6, §4.7, §5, §7, §10)
+  and the thesis presentation, which is newer and wins where they differ
+  (~/_Uni/MasterThesis/presentation/build/presentation-final-4k.pdf and the research notes
+  research/presentation-*.md next to it), plus the GATO pull requests and issues on GitHub.
+  GATO wording (Felix, 25.11.2026): no counts of pull requests or issues.
   Also the home of tiago_mpc and the MPCGPU study (no rows of their own, Felix 24.11.2026).
   Placeholders: class "todo" plus a TODO(felix) comment; see tools/check_todos.sh.
 -->
@@ -38,6 +42,8 @@
   </div>
   <p class="caption">In simulation, the TIAGo Pro's right arm writes “MPC” while dodging a falling object under model predictive control.</p>
 
+  <p>GATO is a GPU trajectory optimiser that its authors had run only on desktop GPUs. For my master's thesis I built a model predictive controller around it for the right arm of a TIAGo Pro and ran it on the NVIDIA Jetson AGX Orin in the robot's backpack. The solve times allow about 500 control updates per second, and the arm tracks trajectories in simulation and on the real robot, though less accurately on the real one. Porting GATO turned up defects in it. I reported them upstream and fixed several myself.</p>
+
   <dl class="facts">
     <dt>Title</dt><dd>Embedded GPU-Accelerated Model Predictive Control: Adapting and Evaluating GATO for the TIAGo Pro</dd>
     <dt>Where</dt><dd>KIT, Institute of Anthropomatics and Robotics, group Optimization and Biomechanics for Human-Centred Robotics</dd>
@@ -45,31 +51,189 @@
     <dt>Links</dt><dd class="links"><a href="../files/Muehlenberend_MSc-Thesis.pdf">thesis PDF</a><a href="https://github.com/A2R-Lab/GATO/pulls?q=author:felixmueh">my pull requests in GATO</a><a href="https://github.com/A2R-Lab/GATO/issues?q=is%3Aissue%20author%3Afelixmueh">my issues in GATO</a><a href="https://github.com/A2R-Lab/GATO">GATO</a><a href="https://github.com/felixmueh/tiago_mpc">tiago_mpc</a><a href="https://github.com/felixmueh/MPCGPU">MPCGPU study</a></dd>
   </dl>
 
-  <h2>Problem</h2>
-  <p>Model predictive control re-plans a robot's motion many times per second, so the trajectory optimiser has to be fast. GPU solvers such as GATO are fast on desktop GPUs, but running one end to end on a real robot, on an embedded computer, was named as future work by the GATO and MPCGPU authors.</p>
-  <p>The question: can GATO control the 7-joint right arm of a TIAGo Pro mobile manipulator from the NVIDIA Jetson AGX Orin in the robot's backpack?</p>
+  <h2>How I built it</h2>
+  <!-- Redrawn from Figure 12 of the thesis (fig:tiago-integration-architecture), with its
+       New / Modified / Used unchanged markers as outline styles. Inline, not a file in media/,
+       so the text uses the page font and the colours come from style.css (.diagram). -->
+  <figure class="diagram">
+  <svg viewBox="0 0 720 834" role="img" aria-labelledby="arch-title arch-desc">
+    <title id="arch-title">Architecture of the controller</title>
+    <desc id="arch-desc">Preparation and build: from the TIAGo Pro URDF and meshes, a reduced right-arm model goes through GRiD code generation into generated dynamics code and joint limits, which are compiled into the planning process. A second path prepares simplified collision meshes and a reviewed list of collision pairs, loaded by the safety monitor at startup. Runtime: three processes in one container. The planning process runs the planning loop and, through GATO's Python interface, the GATO trajectory optimiser with the right-arm plant wrapper on the GPU. The execution controller samples the trajectory and sends effort commands through a ROS adapter and ROS 2 to the TIAGo Pro or Gazebo, and receives the robot state. Trajectory and arm state pass between planning and execution through latest-value buffers. The execution controller sends the robot state to the safety monitor with one request in flight, and receives safety verdicts through a result queue. The safety monitor checks joint position and velocity limits, collisions and speed, using Pinocchio and Coal. Supporting tools: build environment, numerical validation and regression testing.</desc>
+    <defs>
+      <marker id="arch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
 
-  <h2>Approach</h2>
+    <!-- Preparation and build -->
+    <rect class="band" x="10" y="10" width="700" height="196" rx="6"/>
+    <text class="head" x="24" y="30">PREPARATION AND BUILD</text>
+    <rect class="used" x="270" y="22" width="180" height="42" rx="4"/>
+    <text x="360" y="39" text-anchor="middle">TIAGo Pro URDF</text>
+    <text x="360" y="56" text-anchor="middle">and meshes</text>
+    <rect class="new" x="50" y="80" width="270" height="30" rx="4"/>
+    <text x="185" y="100" text-anchor="middle">Reduced right-arm model</text>
+    <rect class="used" x="50" y="122" width="270" height="30" rx="4"/>
+    <text x="185" y="142" text-anchor="middle">GRiD code generation</text>
+    <rect class="out" x="50" y="164" width="270" height="30"/>
+    <text x="185" y="184" text-anchor="middle">Generated dynamics and joint limits</text>
+    <rect class="new" x="400" y="80" width="270" height="30" rx="4"/>
+    <text x="535" y="100" text-anchor="middle">Collision-mesh preparation</text>
+    <rect class="new" x="400" y="122" width="270" height="30" rx="4"/>
+    <text x="535" y="142" text-anchor="middle">Collision-pair review</text>
+    <rect class="out" x="400" y="164" width="270" height="30"/>
+    <text x="535" y="184" text-anchor="middle">Collision model and pair exclusions</text>
+    <path class="flow" d="M270 43 H185 V79" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M450 43 H535 V79" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M185 110 V121" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M185 152 V163" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M535 110 V121" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M535 152 V163" marker-end="url(#arch-arrow)"/>
+
+    <path class="flow" d="M185 194 V261" marker-end="url(#arch-arrow)"/>
+    <text class="small" x="193" y="223">compiled into</text>
+    <path class="flow" d="M535 194 V261" marker-end="url(#arch-arrow)"/>
+    <text class="small" x="543" y="223">loaded at startup</text>
+
+    <!-- Runtime -->
+    <rect class="band-run" x="10" y="232" width="700" height="402" rx="6"/>
+    <text class="head" x="24" y="252">RUNTIME</text>
+    <text class="small" x="696" y="252" text-anchor="end">one container, on the Jetson or a desktop computer</text>
+
+    <rect class="proc" x="24" y="262" width="322" height="188" rx="4"/>
+    <text class="title" x="36" y="282">Planning process</text>
+    <text class="small" x="334" y="282" text-anchor="end">process 1 · variable rate</text>
+    <rect class="mod" x="48" y="294" width="274" height="30" rx="4"/>
+    <text x="185" y="314" text-anchor="middle">Right-arm planning loop</text>
+    <rect class="gpu" x="36" y="352" width="298" height="88" rx="4"/>
+    <text class="small" x="193" y="344">Python interface</text>
+    <text class="small" x="44" y="367">CUDA / GPU</text>
+    <rect class="mod" x="48" y="374" width="274" height="58" rx="4"/>
+    <text x="185" y="391" text-anchor="middle">GATO trajectory optimiser</text>
+    <rect class="mod" x="62" y="400" width="246" height="24" rx="3"/>
+    <text x="185" y="417" text-anchor="middle">Right-arm plant wrapper</text>
+    <!-- Drawn after the GPU boxes so both arrowheads stay on top. -->
+    <path class="flow" d="M185 326 V373" marker-start="url(#arch-arrow)" marker-end="url(#arch-arrow)"/>
+
+    <rect class="proc" x="374" y="262" width="322" height="188" rx="4"/>
+    <text class="title" x="386" y="282">Safety monitor</text>
+    <text class="small" x="684" y="282" text-anchor="end">process 3 · on each new state</text>
+    <rect class="new" x="398" y="294" width="274" height="30" rx="4"/>
+    <text x="535" y="314" text-anchor="middle">Joint position and velocity limits</text>
+    <rect class="new" x="398" y="336" width="274" height="30" rx="4"/>
+    <text x="535" y="356" text-anchor="middle">Collision and speed monitoring</text>
+    <rect class="used" x="455" y="378" width="160" height="30" rx="4"/>
+    <text x="535" y="398" text-anchor="middle">Pinocchio / Coal</text>
+
+    <path class="flow" d="M80 452 V521" marker-end="url(#arch-arrow)"/>
+    <text x="88" y="480">trajectory</text>
+    <text class="small" x="88" y="495">latest-value buffer</text>
+    <path class="flow" d="M230 522 V453" marker-end="url(#arch-arrow)"/>
+    <text x="238" y="480">arm state</text>
+    <text class="small" x="238" y="495">latest-value buffer</text>
+    <path class="flow" d="M420 522 V453" marker-end="url(#arch-arrow)"/>
+    <text x="428" y="480">robot state</text>
+    <text class="small" x="428" y="495">one request in flight</text>
+    <path class="flow" d="M590 452 V521" marker-end="url(#arch-arrow)"/>
+    <text x="598" y="480">safety verdict</text>
+    <text class="small" x="598" y="495">result queue</text>
+
+    <rect class="proc" x="24" y="524" width="672" height="96" rx="4"/>
+    <text class="title" x="36" y="544">Execution controller</text>
+    <text class="small" x="684" y="544" text-anchor="end">process 2 · configurable command rate</text>
+    <rect class="new" x="48" y="556" width="250" height="30" rx="4"/>
+    <text x="173" y="576" text-anchor="middle">Trajectory sampling</text>
+    <path class="flow" d="M298 571 H421" marker-end="url(#arch-arrow)"/>
+    <rect class="new" x="422" y="556" width="250" height="30" rx="4"/>
+    <text x="547" y="576" text-anchor="middle">ROS adapter</text>
+    <text class="small" x="48" y="608">Torque limits, freshness checks and fault response</text>
+
+    <!-- The robot, through ROS 2 -->
+    <path class="flow" d="M500 587 V691" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M600 691 V587" marker-end="url(#arch-arrow)"/>
+    <text class="small" x="492" y="664" text-anchor="end">effort commands</text>
+    <text class="small" x="550" y="664" text-anchor="middle">ROS 2 / DDS</text>
+    <text class="small" x="608" y="664">robot state</text>
+    <rect class="used" x="400" y="692" width="300" height="46" rx="4"/>
+    <text class="title" x="550" y="711" text-anchor="middle">TIAGo Pro or Gazebo simulation</text>
+    <text class="small" x="550" y="729" text-anchor="middle">ROS 2 and PAL control interfaces</text>
+
+    <!-- Legend: the thesis figure's N / M / U markers -->
+    <rect class="new" x="24" y="691" width="18" height="12" rx="2"/>
+    <text class="small" x="50" y="701">New implementation</text>
+    <rect class="mod" x="200" y="691" width="18" height="12" rx="2"/>
+    <text class="small" x="226" y="701">Modified</text>
+    <rect class="used" x="24" y="713" width="18" height="12" rx="2"/>
+    <text class="small" x="50" y="723">Used unchanged</text>
+    <rect class="out" x="200" y="713" width="18" height="12"/>
+    <text class="small" x="226" y="723">Generated output</text>
+
+    <!-- Supporting tools -->
+    <rect class="band" x="10" y="754" width="700" height="70" rx="6"/>
+    <text class="head" x="24" y="774">SUPPORTING TOOLS</text>
+    <rect class="mod" x="24" y="784" width="212" height="28" rx="4"/>
+    <text x="130" y="803" text-anchor="middle">Build environment</text>
+    <rect class="new" x="254" y="784" width="212" height="28" rx="4"/>
+    <text x="360" y="803" text-anchor="middle">Numerical validation</text>
+    <rect class="new" x="484" y="784" width="212" height="28" rx="4"/>
+    <text x="590" y="803" text-anchor="middle">Regression testing</text>
+  </svg>
+  </figure>
+  <p class="caption">The controller around GATO, redrawn from Figure 12 of the thesis.</p>
+
+  <p>Two preparation steps run once, before control. The first reduces the robot description to the seven arm joints on a fixed base and lumps the gripper into one tool link, so that GRiD can generate the dynamics code that GATO compiles in. The second replaces the collision meshes with simpler enclosing ones and keeps a reviewed list of the body pairs that can't collide.</p>
+  <p>At runtime the controller runs as three processes. The planning process calls GATO in a loop and starts each solve as soon as the previous one ends. The execution controller samples the newest plan and sends joint torques through ROS 2 at a configurable rate. Two latest-value buffers between them hold only the newest state and the newest plan, so a slow solve never delays a torque command. I used processes rather than threads because GATO's Python interface holds the global interpreter lock for the whole solve, which would stall the thread that sends the torques.</p>
+  <p>The safety monitor is the third process. It follows the Simplex architecture, in which simple checks decide when a trusted controller takes over from a complex one. Here MPC is the complex controller and the robot's default position controller the trusted one. The monitor checks each new state against the joint limits, a minimum clearance for every checked pair of bodies and a speed limit for every point of the arm. The execution controller rejects plans with non-finite values or torques above 26 Nm and notices when states or plans stop arriving. Any failed check hands the arm back to the position controller. The simplified meshes have about 96% fewer triangles, so the monitor checks every pair that involves the arm at about 60 Hz on the Jetson.</p>
+
+  <h2>My contributions to GATO</h2>
+  <!-- Selection and figures: the presentation's appendix slide "My contributions" (deck page A1)
+       and research/presentation-current-gato-and-contributions.md in ~/_Uni/MasterThesis.
+       No counts of pull requests or issues (Felix, 25.11.2026). -->
+  <p>GATO had not been used on a robot like the TIAGo before, and the port exposed defects. I fixed several in pull requests and reported others in issues, many of them after I had submitted the thesis. The maintainer merged my pull requests and acted on my issues.</p>
+  <div class="numbers">
+    <div><span class="figure-num">13.0 ms</span><br>per control update with my force estimation on the Jetson, instead of 44.9 ms</div>
+    <div><span class="figure-num">+25%</span><br>control updates per second on the Jetson compared with my thesis version, 558 instead of 448 at 32 knot points</div>
+  </div>
+
+  <h3>Correctness</h3>
   <ul>
-    <li>A reduced right-arm model derived from the robot description, with dynamics code generated by GRiD and a robot-specific plant wrapper and objective.</li>
-    <li>The MPC controller adapted to the robot's tasks and timing, in a closed loop through ROS 2, deployed on the Jetson.</li>
-    <li>A safety architecture for the real robot: self-collision monitoring with simplified geometry that hands over to the default position controller on a violation.</li>
-    <li>Evaluation in three settings: GATO's own simulation, Gazebo, and the physical arm. Solve times compared on four GPUs.</li>
-    <li>Reproducible experiments: documented configurations, automated tests, diagnostics, and tools to record and replay runs.</li>
+    <li><strong>Terminal cost</strong> (<a href="https://github.com/A2R-Lab/GATO/pull/17">#17</a>). The solver took the terminal cost at the second-to-last state and with the running weight, so changing the terminal weight had no effect.</li>
+    <li><strong>Race in the Schur assembly</strong> (<a href="https://github.com/A2R-Lab/GATO/pull/18">#18</a>). Thread blocks overwrote Hessian blocks with their inverses while a neighbouring block still read them, so the result depended on the order in which the GPU ran them. I store the inverses in a separate buffer. As a side effect, batches of 8 problems became about 35% faster on a GTX 1070.</li>
+    <li><strong>Mixed joint axes</strong> (<a href="https://github.com/A2R-Lab/GATO/pull/21">#21</a>). On arms whose joints turn about mixed axes, GATO's generic dynamics failed to launch, because the scratch memory for GRiD's helper routines was never allocated. The fix comes with a regression test against Pinocchio.</li>
+    <li><strong>Memory offsets in the dynamics wrappers</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/16">#16</a>). The forward dynamics of the bundled robots used the wrong memory layout and crashed the figure-eight benchmark. The maintainer's fix credits me as co-author.</li>
+    <li><strong>Signed joint axes</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/22">#22</a>). GRiD's old Python reference dynamics ignored negative joint axes. The maintainer retired it and added tests for signed axes.</li>
   </ul>
 
-  <h2>Result</h2>
+  <h3>Performance</h3>
+  <ul>
+    <li><strong>Force estimation on embedded GPUs.</strong> GATO estimates an external force by solving a batch of trajectory optimisations, one per force hypothesis. On the Jetson a batch of 16 takes several times as long as a single solve. I batch only the dynamics to pick the hypothesis and then optimise once. A control update takes 13.0 instead of 44.9 ms, and the arm compensates an external force as well as before. This change is part of my thesis code, not of upstream GATO.</li>
+    <li><strong>Merit evaluation on embedded GPUs</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/19">#19</a>). Profiling on the Jetson showed that the merit evaluation of the line search dominates batched solves. My measurements led to smaller thread blocks for it on embedded GPUs, which the maintainer made the default. A batch of 16 solves for GATO's Indy7 arm went from 63.9 to 34.2 ms (32 knot points, eight SQP iterations). Compared with my thesis version, the current GATO with the current TIAGo model allows 558 instead of 448 control updates per second at 32 knot points, and 194 instead of 103 for a batch of 8.</li>
+    <li><strong>Direct solver on the Jetson</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/19">#19</a>). My sweeps showed that GATO's direct solver returned its starting point unchanged on the Jetson. The maintainer fixed the cause, and my reruns were the basis for the new default, which uses the direct solver from 256 knot points.</li>
+    <li><strong>Collision checks in ADMM</strong> (<a href="https://github.com/A2R-Lab/GATO/pull/25">#25</a>). GATO evaluated the collision rows in every ADMM inner iteration, although they change only once per SQP iteration. Caching them cut a solve with 250 obstacle primitives from 24.9 to 4.1 ms on a GTX 1070.</li>
+    <li><strong>Moving targets</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/26">#26</a>). I measured that re-applying the cost menu for every new target costs up to 296 µs of host time. The maintainer added an update for targets only.</li>
+  </ul>
+
+  <h3>Build, workflow and robot support</h3>
+  <ul>
+    <li><strong>Setup on a clean system</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/15">#15</a>). The installer called a build target that didn't exist, and the CMake requirement didn't match. The maintainer's fix credits me as co-author.</li>
+    <li><strong>CMake version</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/23">#23</a>). On the Jetson the build failed because the declared minimum CMake version was too old for the features it uses. I reported it and tested the fix.</li>
+    <li><strong>Solver settings in experiment records</strong> (<a href="https://github.com/A2R-Lab/GATO/pull/24">#24</a>). GATO now reports its ADMM iteration budget, so a recorded run holds the complete solver configuration.</li>
+    <li><strong>TIAGo Pro support</strong> (<a href="https://github.com/A2R-Lab/GATO/issues/20">#20</a>). Hard Coulomb friction stalled the controller on the TIAGo. My report, my task-cost requirements and measured TIAGo parameters led to smooth friction, the cost menu and rotor-inertia support in GATO. The maintainer implemented them, and the rotor-inertia support builds on code I supplied.</li>
+    <li><strong>In my thesis fork</strong> I made the build reproducible with a lockfile that also covers the Jetson's ARM processor, enabled CUDA error checks in release builds and added automated tests to the build. GATO has since added its own test suite and an installation without containers.</li>
+  </ul>
+
+  <h2>Results</h2>
+  <!-- Figures: presentation slides 13/20 (Jetson matrix) and 15/20 (sim-to-real gap) in
+       ~/_Uni/MasterThesis/presentation/build/presentation-final-4k.pdf, thesis §5.2, §5.3, §4.7 and §10.
+       "About 500" is the presentation's spoken summary of 623 (16 knots) and 448 (32 knots). -->
   <div class="numbers">
-    <!-- 500/s: Felix 2026-11-25; the MA abstract (§10) says ~150 for 5 SQP iterations and 32 knots -->
-    <div><span class="figure-num">≈ 500</span><br>control updates per second at most, as far as the solve times on the Jetson allow</div>
-    <div><span class="figure-num">13.0 ms</span><br>per update with the redesigned force estimation, instead of 44.9 ms</div>
+    <div><span class="figure-num">≈ 500</span><br>control updates per second on the Jetson with 16 to 32 knot points</div>
+    <div><span class="figure-num">46.4 mm</span><br>RMS error on the real arm for a 24 s figure-eight, 19.4 mm in GATO's simulation</div>
   </div>
   <ul>
-    <li>Viable for setpoint and trajectory tracking. With one SQP iteration, still more than 100 updates per second for horizons of several seconds.</li>
-    <li>In GATO's simulation, tracking on the Jetson is as accurate as on desktop GPUs up to 64 knot points. Gazebo and the real arm work end to end, but with degraded performance that points to the robot model, not to the solver.</li>
-    <li>Force estimation: on the embedded GPU a batch takes several times as long as one problem, so I batch only the dynamics instead of whole optimisation problems. Same compensation of an external force, 13.0 instead of 44.9 ms per update.</li>
+    <li>With one SQP iteration per update, the solve times on the Jetson allow 623 control updates per second at 16 knot points and 448 at 32. With up to five SQP iterations, about 150 remain at 32 knot points. For horizons of several seconds (128 knot points), one iteration still allows more than 100.</li>
+    <li>In GATO's simulation the Jetson tracks as accurately as desktop GPUs up to 64 knot points. In Gazebo and on the real arm, control works end to end, but the error is larger: 62.9 mm in Gazebo and 46.4 mm on the arm. On the arm, the controller with its default weights reached none of three test goals, and with higher weights the nearest one within 0.6 s. One explanation is joint losses such as friction, which my prediction model leaves out.</li>
+    <li>After the thesis, in simulation with joint friction, friction feedforward and PD feedback at execution cut the error of a 6 s figure-eight from 52.2 to 7.0 mm. This still has to be tested on the real arm.</li>
+    <li>In Gazebo I injected 19 kinds of faults in 30 trials. In most of them the safety architecture caught the fault and handed the arm back in time. A fault in the execution controller itself isn't covered, because that process runs the fault response.</li>
     <li><strong>What didn't work:</strong> batches of initial guesses (multi-start) found better motions in tuned experiments, e.g. around a moving obstacle, but didn't reach more goals in general.</li>
-    <li>Open source: porting exposed defects in GATO, which I reported in issues and fixed in pull requests. GATO adopted my contributions, among them fixes for an ignored terminal cost weight (#17), a read/write race in the Schur assembly that also made batched solves about 35% faster (#18), and a crash on arms with mixed joint axes (#21). My issue on solver timing on embedded GPUs (#19) led to a new default and a timing API, and my Jetson measurements are now in GATO's documentation.</li>
   </ul>
 
   <h2>Replay in the browser</h2>
