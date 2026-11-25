@@ -142,9 +142,6 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .home-header .bio { grid-area: bio; }
 .home-header h1 { font-size: 2rem; font-weight: 400; margin: 0 0 0.4rem; }
 .home-header .name .links { justify-content: center; margin-bottom: 0.8rem; }
-/* "CV: Deutsch · English" wraps as one unit, so a phone never splits it
-   across two lines. */
-.cv-links { white-space: nowrap; }
 
 /* ------------------------------------------------------------------------------
    Project rows (Barron): clip left, text right
