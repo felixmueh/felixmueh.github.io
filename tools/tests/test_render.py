@@ -93,6 +93,27 @@ def test_no_private_person_field_reaches_any_page(site):
                 assert value not in digits, f"{page.name} contains the phone number"
 
 
+def test_the_public_cv_pdf_has_no_private_field():
+    """The CV page's PDF (files/Muehlenberend-Felix_CV.pdf) is built in the
+    Bewerbung repo (cv/jobs/_public) and copied here by hand, so check the
+    copy that gets published, not the build: pdftotext over the real file,
+    against the real `person` values."""
+    pdf = SITE / "files" / "Muehlenberend-Felix_CV.pdf"
+    assert pdf.is_file(), "cv.html links files/Muehlenberend-Felix_CV.pdf, which is missing"
+    person = yaml.safe_load((SITE / "data" / "cv.yaml").read_text(encoding="utf-8"))["person"]
+    text = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True,
+                          check=True).stdout
+    flat = re.sub(r"\s+", " ", text.replace("\u00a0", " "))
+    digits = re.sub(r"\D", "", text)
+
+    for value in private_values(person):
+        if value.isdigit():
+            assert value not in digits, "the public CV PDF contains the phone number"
+        elif not value.startswith("../"):   # photo/signature paths aren't text
+            assert value not in flat, f"the public CV PDF contains private data: {value!r}"
+    assert person["email"] in flat and "github.com/felixmueh" in flat
+
+
 def test_confidential_lines_are_skipped(site):
     data = yaml.safe_load((site / "data" / "cv.yaml").read_text(encoding="utf-8"))
     mercedes = next(e for e in data["entries"] if e["id"] == "mercedes")

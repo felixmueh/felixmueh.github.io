@@ -40,13 +40,12 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .column { max-width: var(--column); margin: 0 auto; padding: 0 16px; }
 
 /* ------------------------------------------------------------------------------
-   Top nav, shared by every page
+   Subpages: one small link back home instead of a nav bar (Felix, 25.11.2026:
+   the bar only repeated his name and links that the home page shows anyway).
+   The home page has no bar at all, its header holds the name and the links.
    ------------------------------------------------------------------------------ */
-.topnav { border-bottom: 1px solid var(--rule); }
-.topnav .column { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 56px; }
-.topnav .brand { color: var(--text); font-weight: 600; white-space: nowrap; }
-.topnav ul { display: flex; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
-.topnav a[aria-current="page"] { color: var(--text); font-weight: 600; }
+.backlink { padding-top: 1rem; font-size: 0.95rem; }
+.lang-note { margin-top: 1.5rem; }
 
 /* ------------------------------------------------------------------------------
    Placeholders (TODO(felix)): every one carries the class .todo and a
@@ -206,7 +205,6 @@ code { font-family: var(--mono); font-size: 0.9em; }
    ------------------------------------------------------------------------------ */
 @media (max-width: 640px) {
   body { font-size: 15px; }
-  .topnav ul { gap: 0.9rem; }
 
   .home-header {
     grid-template-columns: 96px 1fr;

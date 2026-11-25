@@ -8,7 +8,11 @@ rendered into the HTML from Felix's CV data before committing (below).
 Served by GitHub Pages from the root of `main`.
 
 Pages: `index.html` (Home), `projects/*.html` (one page per project),
-`cv.html`, `legal.html` (Impressum / Datenschutz).
+`cv.html`, `legal.html` (Impressum / Datenschutz), `404.html` (served by
+GitHub Pages for any missing path, so it uses root-relative paths).
+`demos/` holds self-contained browser demos (the gato_visualizer replay).
+The home page has no nav bar (its header holds the name and the links),
+and each subpage has one small link back home.
 
 ## Preview
 
@@ -41,7 +45,13 @@ run
 
     tools/check_todos.sh
 
-It lists every item by page and exits non-zero while any are left.
+It lists every item by page and exits non-zero while any are left. Then
+
+    python3 tools/check_links.py
+
+checks that no page loads anything from another origin and that every
+internal link and media path resolves, and lists the files in `media/`
+and `files/` that no page uses, with the total size.
 
 ## Content from cv.yaml
 
@@ -92,6 +102,12 @@ private `person` value reaches a page:
     python3 -m pytest tools/tests    # any Python with pytest, PyYAML, Jinja2
 
 Before committing, check that `git ls-files data` prints nothing.
+
+The CV page's PDF, `files/Muehlenberend-Felix_CV.pdf`, is built in the
+Bewerbung repo from `cv/jobs/_public` (English, no address, phone, birth
+date, photo or signature; how to rebuild and copy it: that job.yaml). The
+same test file checks the copy here with pdftotext against the private
+`person` values.
 
 ## Layout prototype
 

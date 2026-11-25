@@ -43,7 +43,7 @@ from markupsafe import Markup
 ROOT = Path(__file__).resolve().parent.parent  # the site repo
 DATA = ROOT / "data"
 LANG = "en"                 # the site is English only for now
-# TODO(felix): a German version of the CV page (cv.html has a DE/EN placeholder).
+# TODO: a German version of the CV page, if Felix wants one (website-tasks.org, "Language").
 CV_PROJECT_PRESET = "general"
 
 
