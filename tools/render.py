@@ -7,8 +7,10 @@ Input:   data/cv.yaml: a git-ignored symlink into the Bewerbung repo
          (cv/data/), see README.md "Content from cv.yaml".
 Outputs: index.html  the project rows, between
                      <!-- BEGIN generated: projects --> and <!-- END generated: projects -->,
-                     and the "More projects" list, between
-                     <!-- BEGIN generated: more-projects --> and <!-- END generated: more-projects -->
+                     the "More projects" list, between
+                     <!-- BEGIN generated: more-projects --> and <!-- END generated: more-projects -->,
+                     and the "Engagement" list, between
+                     <!-- BEGIN generated: engagement --> and <!-- END generated: engagement -->
 Everything outside the markers stays hand-written and is left alone.
 
 The CV data is the single source for the PDF CV and this site
@@ -142,13 +144,18 @@ def to_html(text: str) -> Markup:
 # `reviewed` is Felix's approval marker (Bewerbung cv/README.md, "reviewed");
 # it is accepted here and not rendered.
 #
-# `section` splits the rows into two lists (Felix, 25.11.2026): like on
+# `section` splits the rows into three lists (Felix, 25.11.2026): like on
 # jonbarron.info every row of the main list has a picture, and projects
 # without a useful one go to the compact text-only "More projects" list
-# below it. Each list is sorted by `order`, which stays unique across both.
+# below it. "Engagement" (coaching, volunteering) comes last, after both
+# project lists: it isn't project work, and between them it would split
+# the projects in two. Its rows use the main list's row markup, with or
+# without a picture: a text-only row (DLRG) leaves the picture slot empty,
+# so its text lines up with the rows that have one. Each list is sorted by
+# `order`, which stays unique across all three.
 WEB_KEYS = {"order", "highlight", "title", "meta", "tech", "summary", "clip", "still", "page",
             "links", "reviewed", "section"}
-SECTIONS = ("main", "more")
+SECTIONS = ("main", "more", "engagement")
 
 
 def row_media(web: dict, where: str) -> dict | None:
@@ -215,7 +222,7 @@ def project_rows(data: dict) -> list[dict]:
                 raise RenderError(f"{where}: {', '.join(unshown)} not shown in \"More projects\" "
                                   f"(section: more)")
 
-        media = row_media(web, where) if section == "main" else None
+        media = row_media(web, where) if section != "more" else None
 
         # Links: "project page" first when there is a page, then the listed
         # ones. A link without url is shown as text (usually a placeholder).
@@ -252,10 +259,9 @@ def project_rows(data: dict) -> list[dict]:
     return sorted(rows, key=lambda r: r["order"])
 
 
-def split_sections(rows: list[dict]) -> tuple[list[dict], list[dict]]:
-    """The rows of the main list and of "More projects", each still in `order`."""
-    return ([r for r in rows if r["section"] == "main"],
-            [r for r in rows if r["section"] == "more"])
+def split_sections(rows: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    """The rows of the main list, of "More projects" and of "Engagement", each still in `order`."""
+    return tuple([r for r in rows if r["section"] == section] for section in SECTIONS)
 
 
 ROWS_TEMPLATE = """\
@@ -326,6 +332,18 @@ MORE_TEMPLATE = """\
 """
 
 
+# "Engagement": the main list's rows (ROWS_TEMPLATE, rendered first and
+# passed in as `rows_html`) under their own heading. Empty list → nothing,
+# not even the heading, like "More projects".
+ENGAGEMENT_TEMPLATE = """\
+{% if rows_html %}
+  <h2 id="engagement">Engagement</h2>
+  <div class="rows">{{ rows_html }}
+  </div>
+{%- endif %}
+"""
+
+
 # ==============================================================================
 # Writing between the markers
 # ==============================================================================
@@ -348,12 +366,16 @@ def main() -> int:
     try:
         data = load("cv.yaml")
         env = jinja2.Environment(autoescape=True, keep_trailing_newline=True)
-        main_rows, more_rows = split_sections(project_rows(data))
+        main_rows, more_rows, engagement_rows = split_sections(project_rows(data))
         rows = env.from_string(ROWS_TEMPLATE).render(rows=main_rows)
         more = env.from_string(MORE_TEMPLATE).render(rows=more_rows)
-        # Splice both lists before writing, so an error leaves the page untouched.
+        engagement_html = env.from_string(ROWS_TEMPLATE).render(rows=engagement_rows).rstrip()
+        engagement = env.from_string(ENGAGEMENT_TEMPLATE).render(
+            rows_html=Markup(engagement_html) if engagement_rows else "")
+        # Splice all lists before writing, so an error leaves the page untouched.
         index = splice((ROOT / "index.html").read_text(encoding="utf-8"), "projects", rows)
         index = splice(index, "more-projects", more)
+        index = splice(index, "engagement", engagement)
     except RenderError as e:
         print(f"render.py: {e}", file=sys.stderr)
         return 1

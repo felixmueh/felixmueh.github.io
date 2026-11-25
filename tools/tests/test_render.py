@@ -197,10 +197,11 @@ def test_more_rows_go_to_their_own_list_each_in_order():
         {"order": 4, "section": "more"}, {"order": 1}, {"order": 2, "section": "more"},
         {"order": 3, "section": "main"}))
 
-    main, more = render.split_sections(rows)
+    main, more, engagement = render.split_sections(rows)
 
     assert [r["order"] for r in main] == [1, 3]
     assert [r["order"] for r in more] == [2, 4]
+    assert engagement == []
 
 
 def test_more_list_is_compact_text_with_tech_in_the_meta_line():
@@ -228,3 +229,41 @@ def test_an_unknown_section_fails():
 def test_media_in_more_fails():
     with pytest.raises(render.RenderError, match="still"):
         render.project_rows(entries({"order": 1, "section": "more", "still": "media/werk/werk.jpg"}))
+
+
+# ==============================================================================
+# section: engagement, after both project lists
+# ==============================================================================
+def render_engagement(rows: list[dict]) -> str:
+    env = render.jinja2.Environment(autoescape=True)
+    rows_html = env.from_string(render.ROWS_TEMPLATE).render(rows=rows).rstrip()
+    return env.from_string(render.ENGAGEMENT_TEMPLATE).render(
+        rows_html=render.Markup(rows_html) if rows else "")
+
+
+def test_engagement_rows_get_their_own_list_with_or_without_a_clip(tmp_path, monkeypatch):
+    monkeypatch.setattr(render, "ROOT", tmp_path)
+    (tmp_path / "media" / "coach").mkdir(parents=True)
+    for name in ("coach.webm", "coach.jpg"):
+        (tmp_path / "media" / "coach" / name).write_bytes(b"x")
+    rows = render.project_rows(entries(
+        {"order": 3, "section": "engagement", "title": "Swimming instructor", "summary": "Trained swimmers."},
+        {"order": 1},
+        {"order": 2, "section": "engagement", "title": "Coaching",
+         "clip": "media/coach/coach.webm", "still": "media/coach/coach.jpg"}))
+
+    main, more, engagement = render.split_sections(rows)
+    html_out = render_engagement(engagement)
+
+    assert [r["order"] for r in main] == [1] and more == []
+    assert [r["order"] for r in engagement] == [2, 3]
+    assert '<h2 id="engagement">Engagement</h2>' in html_out
+    # The coaching row shows its clip, the text-only row an empty picture slot.
+    assert '<source src="media/coach/coach.webm" type="video/webm">' in html_out
+    coaching, swimming = html_out.split("<article")[1:]
+    assert "<video" in coaching and "Coaching" in coaching
+    assert "<div></div>" in swimming and "Swimming instructor" in swimming
+
+
+def test_empty_engagement_list_renders_no_heading():
+    assert render_engagement([]).strip() == ""

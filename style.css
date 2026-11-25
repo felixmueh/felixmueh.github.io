@@ -212,6 +212,9 @@ code { font-family: var(--mono); font-size: 0.9em; }
   h2#projects { margin-top: 1.2rem; }
 
   .row { grid-template-columns: 1fr; gap: 0.6rem; padding: 0.6rem 0; }
+  /* A text-only row (Engagement: DLRG) keeps an empty picture slot so its
+     text lines up on a wide screen; stacked, the slot would only add a gap. */
+  .row > div:empty { display: none; }
   .row.key { padding: 0.6rem; }
   .more-projects { padding: 0; }
   .mini-timeline li { grid-template-columns: 1fr; gap: 0; }

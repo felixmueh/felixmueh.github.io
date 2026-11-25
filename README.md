@@ -58,7 +58,8 @@ and `files/` that no page uses, with the total size.
 
 ## Content from cv.yaml
 
-The project rows on the home page (the main list and "More projects") are
+The project rows on the home page (the main list, "More projects" and the
+"Engagement" rows after them) are
 generated from Felix's CV data in the Bewerbung repo (`cv/data/cv.yaml`),
 the same file the PDF CVs are built from: one row per entry with a `web:`
 block (order, section, title, meta line, summary, clip, links; schema in
