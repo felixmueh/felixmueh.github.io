@@ -42,7 +42,7 @@
   </div>
   <p class="caption">In simulation, the TIAGo Pro's right arm writes “MPC” while dodging a falling object under model predictive control.</p>
 
-  <p>GATO is a GPU trajectory optimiser that its authors had run only on desktop GPUs. For my master's thesis I built a model predictive controller around it for the right arm of a TIAGo Pro and ran it on the NVIDIA Jetson AGX Orin in the robot's backpack. The solve times allow about 500 control updates per second, and the arm tracks trajectories in simulation and on the real robot, though less accurately on the real one. Porting GATO turned up defects in it. I reported them upstream and fixed several myself.</p>
+  <p>Model predictive control lets a robot react to disturbances by re-optimising its motion many times per second. On a mobile robot, each optimisation has to finish within milliseconds on the computer the robot carries. GATO is a GPU trajectory optimiser that its authors had run only on desktop GPUs. For my master's thesis I built a model predictive controller around it for the right arm of a TIAGo Pro and ran it on the NVIDIA Jetson AGX Orin in the robot's backpack. The solve times allow about 500 control updates per second, and the arm tracks trajectories in simulation and on the real robot, though less accurately on the real one. Porting GATO turned up defects in it. I reported them upstream and fixed several myself.</p>
 
   <dl class="facts">
     <dt>Title</dt><dd>Embedded GPU-Accelerated Model Predictive Control: Adapting and Evaluating GATO for the TIAGo Pro</dd>
