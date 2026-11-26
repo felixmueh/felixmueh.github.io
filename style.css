@@ -198,22 +198,47 @@ code { font-family: var(--mono); font-size: 0.9em; }
    ~690 px the drawing would shrink its text under 11 px, so it keeps a minimum
    width and scrolls inside its box instead, never the page.
    ------------------------------------------------------------------------------ */
-.diagram { margin: 1rem 0 0.4rem; overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
-.diagram svg { display: block; width: 100%; min-width: 660px; height: auto; color: #1a1a1a; }
+/* The fill shows who built what (Felix, 26.11.2026: in the thesis figure's
+   letter-badge style his own processes read as not built by him). What he
+   built is a soft blue tint with a blue outline; a built part inside a built
+   process box is white with the same outline, so the nesting reads without
+   stacking blues. Parts he modified are white with a dashed blue outline,
+   parts used unchanged grey. Generated outputs, the bands and the CUDA/GPU
+   area are neutral. The process boxes carry the heaviest outline, so the eye
+   lands on them first. Light only, like the rest of the site: a dark mode
+   would redefine these tokens. */
+.diagram {
+  --dg-text: #1a1a1a;
+  --dg-muted: #5f6368;
+  --dg-line: #4a4f55;           /* arrows */
+  --dg-built: #dfeaf8;          /* fill of what Felix built */
+  --dg-built-line: #1a5fb4;     /* = --link; outline of built and modified parts */
+  --dg-used: #ececec;
+  --dg-used-line: #9a9a9a;
+  --dg-out-line: #b5b5b5;
+  --dg-band: #f5f5f5;
+  --dg-band-line: #d0d0d0;
+  --dg-run: #f2f6fb;
+  --dg-run-line: #c9d6e6;
+  --dg-area: #f3f5f8;           /* the CUDA/GPU area inside the planning process */
+  margin: 1rem 0 0.4rem; overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: #fff;
+}
+.diagram svg { display: block; width: 100%; min-width: 660px; height: auto; color: var(--dg-text); }
 .diagram text { font-family: var(--font); font-size: 13px; fill: currentColor; }
-.diagram .small { font-size: 11.5px; fill: #5f6368; }
-.diagram .head { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; fill: #5f6368; }
+.diagram .small { font-size: 11.5px; fill: var(--dg-muted); }
+.diagram .head { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; fill: var(--dg-muted); }
 .diagram .title { font-weight: 600; }
-.diagram .band { fill: #f5f5f5; stroke: #d0d0d0; }
-.diagram .band-run { fill: #f2f6fb; stroke: #c9d6e6; }
-.diagram .proc { fill: #fff; stroke: #8a9199; }
-.diagram .gpu { fill: #eef1f5; stroke: none; }
-.diagram .new { fill: #e6eff9; stroke: #1a5fb4; stroke-width: 1.4; }
-.diagram .mod { fill: #fff; stroke: #1a5fb4; stroke-width: 1.4; stroke-dasharray: 5 3; }
-.diagram .used { fill: #efefef; stroke: #9a9a9a; }
-.diagram .out { fill: #fff; stroke: #b5b5b5; }
-.diagram .flow { fill: none; stroke: #4a4f55; stroke-width: 1.3; }
-.diagram .arrowhead { fill: #4a4f55; }
+.diagram .band { fill: var(--dg-band); stroke: var(--dg-band-line); }
+.diagram .band-run { fill: var(--dg-run); stroke: var(--dg-run-line); }
+.diagram .gpu { fill: var(--dg-area); stroke: none; }
+.diagram .built { fill: var(--dg-built); stroke: var(--dg-built-line); stroke-width: 1.3; }
+.diagram .built-process { stroke-width: 1.6; }
+.diagram .built-part { fill: #fff; stroke: var(--dg-built-line); stroke-width: 1.3; }
+.diagram .mod { fill: #fff; stroke: var(--dg-built-line); stroke-width: 1.3; stroke-dasharray: 5 3; }
+.diagram .used { fill: var(--dg-used); stroke: var(--dg-used-line); }
+.diagram .out { fill: #fff; stroke: var(--dg-out-line); }
+.diagram .flow { fill: none; stroke: var(--dg-line); stroke-width: 1.3; }
+.diagram .arrowhead { fill: var(--dg-line); }
 
 /* ------------------------------------------------------------------------------
    Phone width. The home header shrinks to a 96 px photo beside the name and

@@ -52,13 +52,17 @@
   </dl>
 
   <h2>How I built it</h2>
-  <!-- Redrawn from Figure 12 of the thesis (fig:tiago-integration-architecture), with its
-       New / Modified / Used unchanged markers as outline styles. Inline, not a file in media/,
+  <!-- Redrawn from Figure 12 of the thesis (fig:tiago-integration-architecture). The thesis
+       marks each component with a letter badge (N new / M modified / U used unchanged) and
+       leaves the process boxes unmarked, so they read as not his. Here the fill shows who
+       built what instead (Felix, 26.11.2026, variant "A1" of a side-by-side comparison): what
+       I built a soft blue tint, modified parts white with a dashed blue outline, parts used
+       unchanged grey, and the three processes count as built. Inline, not a file in media/,
        so the text uses the page font and the colours come from style.css (.diagram). -->
   <figure class="diagram">
   <svg viewBox="0 0 720 834" role="img" aria-labelledby="arch-title arch-desc">
     <title id="arch-title">Architecture of the controller</title>
-    <desc id="arch-desc">Preparation and build: from the TIAGo Pro URDF and meshes, a reduced right-arm model goes through GRiD code generation into generated dynamics code and joint limits, which are compiled into the planning process. A second path prepares simplified collision meshes and a reviewed list of collision pairs, loaded by the safety monitor at startup. Runtime: three processes in one container. The planning process runs the planning loop and, through GATO's Python interface, the GATO trajectory optimiser with the right-arm plant wrapper on the GPU. The execution controller samples the trajectory and sends effort commands through a ROS adapter and ROS 2 to the TIAGo Pro or Gazebo, and receives the robot state. Trajectory and arm state pass between planning and execution through latest-value buffers. The execution controller sends the robot state to the safety monitor with one request in flight, and receives safety verdicts through a result queue. The safety monitor checks joint position and velocity limits, collisions and speed, using Pinocchio and Coal. Supporting tools: build environment, numerical validation and regression testing.</desc>
+    <desc id="arch-desc">Preparation and build: from the TIAGo Pro URDF and meshes, a reduced right-arm model goes through GRiD code generation into generated dynamics code and joint limits, which are compiled into the planning process. A second path prepares simplified collision meshes and a reviewed list of collision pairs, loaded by the safety monitor at startup. Runtime: three processes in one container. The planning process runs the planning loop and, through GATO's Python interface, the GATO trajectory optimiser with the right-arm plant wrapper on the GPU. The execution controller samples the trajectory and sends effort commands through a ROS adapter and ROS 2 to the TIAGo Pro or Gazebo, and receives the robot state. Trajectory and arm state pass between planning and execution through latest-value buffers. The execution controller sends the robot state to the safety monitor with one request in flight, and receives safety verdicts through a result queue. The safety monitor checks joint position and velocity limits, collisions and speed, using Pinocchio and Coal. Supporting tools: build environment, numerical validation and regression testing. Built by me: the three processes with their parts, the reduced model, the collision-mesh preparation, the collision-pair review, numerical validation and regression testing. Modified by me: the planning loop, the GATO trajectory optimiser, the plant wrapper and the build environment. Used unchanged: the URDF and meshes, GRiD, Pinocchio and Coal, and the robot or simulation.</desc>
     <defs>
       <marker id="arch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
     </defs>
@@ -69,15 +73,15 @@
     <rect class="used" x="270" y="22" width="180" height="42" rx="4"/>
     <text x="360" y="39" text-anchor="middle">TIAGo Pro URDF</text>
     <text x="360" y="56" text-anchor="middle">and meshes</text>
-    <rect class="new" x="50" y="80" width="270" height="30" rx="4"/>
+    <rect class="built" x="50" y="80" width="270" height="30" rx="4"/>
     <text x="185" y="100" text-anchor="middle">Reduced right-arm model</text>
     <rect class="used" x="50" y="122" width="270" height="30" rx="4"/>
     <text x="185" y="142" text-anchor="middle">GRiD code generation</text>
     <rect class="out" x="50" y="164" width="270" height="30"/>
     <text x="185" y="184" text-anchor="middle">Generated dynamics and joint limits</text>
-    <rect class="new" x="400" y="80" width="270" height="30" rx="4"/>
+    <rect class="built" x="400" y="80" width="270" height="30" rx="4"/>
     <text x="535" y="100" text-anchor="middle">Collision-mesh preparation</text>
-    <rect class="new" x="400" y="122" width="270" height="30" rx="4"/>
+    <rect class="built" x="400" y="122" width="270" height="30" rx="4"/>
     <text x="535" y="142" text-anchor="middle">Collision-pair review</text>
     <rect class="out" x="400" y="164" width="270" height="30"/>
     <text x="535" y="184" text-anchor="middle">Collision model and pair exclusions</text>
@@ -87,18 +91,19 @@
     <path class="flow" d="M185 152 V163" marker-end="url(#arch-arrow)"/>
     <path class="flow" d="M535 110 V121" marker-end="url(#arch-arrow)"/>
     <path class="flow" d="M535 152 V163" marker-end="url(#arch-arrow)"/>
-
-    <path class="flow" d="M185 194 V261" marker-end="url(#arch-arrow)"/>
     <text class="small" x="193" y="223">compiled into</text>
-    <path class="flow" d="M535 194 V261" marker-end="url(#arch-arrow)"/>
     <text class="small" x="543" y="223">loaded at startup</text>
 
     <!-- Runtime -->
     <rect class="band-run" x="10" y="232" width="700" height="402" rx="6"/>
     <text class="head" x="24" y="252">RUNTIME</text>
-    <text class="small" x="696" y="252" text-anchor="end">one container, on the Jetson or a desktop computer</text>
+    <!-- Centred between the two incoming arrows (x 185 and 535), so neither crosses it. -->
+    <text class="small" x="360" y="252" text-anchor="middle">one container, on the Jetson or a desktop computer</text>
+    <!-- Drawn after the band, which would otherwise paint over them. -->
+    <path class="flow" d="M185 194 V261" marker-end="url(#arch-arrow)"/>
+    <path class="flow" d="M535 194 V261" marker-end="url(#arch-arrow)"/>
 
-    <rect class="proc" x="24" y="262" width="322" height="188" rx="4"/>
+    <rect class="built built-process" x="24" y="262" width="322" height="188" rx="4"/>
     <text class="title" x="36" y="282">Planning process</text>
     <text class="small" x="334" y="282" text-anchor="end">process 1 · variable rate</text>
     <rect class="mod" x="48" y="294" width="274" height="30" rx="4"/>
@@ -113,12 +118,12 @@
     <!-- Drawn after the GPU boxes so both arrowheads stay on top. -->
     <path class="flow" d="M185 326 V373" marker-start="url(#arch-arrow)" marker-end="url(#arch-arrow)"/>
 
-    <rect class="proc" x="374" y="262" width="322" height="188" rx="4"/>
+    <rect class="built built-process" x="374" y="262" width="322" height="188" rx="4"/>
     <text class="title" x="386" y="282">Safety monitor</text>
     <text class="small" x="684" y="282" text-anchor="end">process 3 · on each new state</text>
-    <rect class="new" x="398" y="294" width="274" height="30" rx="4"/>
+    <rect class="built-part" x="398" y="294" width="274" height="30" rx="4"/>
     <text x="535" y="314" text-anchor="middle">Joint position and velocity limits</text>
-    <rect class="new" x="398" y="336" width="274" height="30" rx="4"/>
+    <rect class="built-part" x="398" y="336" width="274" height="30" rx="4"/>
     <text x="535" y="356" text-anchor="middle">Collision and speed monitoring</text>
     <rect class="used" x="455" y="378" width="160" height="30" rx="4"/>
     <text x="535" y="398" text-anchor="middle">Pinocchio / Coal</text>
@@ -136,13 +141,13 @@
     <text x="598" y="480">safety verdict</text>
     <text class="small" x="598" y="495">result queue</text>
 
-    <rect class="proc" x="24" y="524" width="672" height="96" rx="4"/>
+    <rect class="built built-process" x="24" y="524" width="672" height="96" rx="4"/>
     <text class="title" x="36" y="544">Execution controller</text>
     <text class="small" x="684" y="544" text-anchor="end">process 2 · configurable command rate</text>
-    <rect class="new" x="48" y="556" width="250" height="30" rx="4"/>
+    <rect class="built-part" x="48" y="556" width="250" height="30" rx="4"/>
     <text x="173" y="576" text-anchor="middle">Trajectory sampling</text>
     <path class="flow" d="M298 571 H421" marker-end="url(#arch-arrow)"/>
-    <rect class="new" x="422" y="556" width="250" height="30" rx="4"/>
+    <rect class="built-part" x="422" y="556" width="250" height="30" rx="4"/>
     <text x="547" y="576" text-anchor="middle">ROS adapter</text>
     <text class="small" x="48" y="608">Torque limits, freshness checks and fault response</text>
 
@@ -156,11 +161,11 @@
     <text class="title" x="550" y="711" text-anchor="middle">TIAGo Pro or Gazebo simulation</text>
     <text class="small" x="550" y="729" text-anchor="middle">ROS 2 and PAL control interfaces</text>
 
-    <!-- Legend: the thesis figure's N / M / U markers -->
-    <rect class="new" x="24" y="691" width="18" height="12" rx="2"/>
-    <text class="small" x="50" y="701">New implementation</text>
+    <!-- Legend: who built what, as the fill colour -->
+    <rect class="built" x="24" y="691" width="18" height="12" rx="2"/>
+    <text class="small" x="50" y="701">Built by me</text>
     <rect class="mod" x="200" y="691" width="18" height="12" rx="2"/>
-    <text class="small" x="226" y="701">Modified</text>
+    <text class="small" x="226" y="701">Modified by me</text>
     <rect class="used" x="24" y="713" width="18" height="12" rx="2"/>
     <text class="small" x="50" y="723">Used unchanged</text>
     <rect class="out" x="200" y="713" width="18" height="12"/>
@@ -171,9 +176,9 @@
     <text class="head" x="24" y="774">SUPPORTING TOOLS</text>
     <rect class="mod" x="24" y="784" width="212" height="28" rx="4"/>
     <text x="130" y="803" text-anchor="middle">Build environment</text>
-    <rect class="new" x="254" y="784" width="212" height="28" rx="4"/>
+    <rect class="built" x="254" y="784" width="212" height="28" rx="4"/>
     <text x="360" y="803" text-anchor="middle">Numerical validation</text>
-    <rect class="new" x="484" y="784" width="212" height="28" rx="4"/>
+    <rect class="built" x="484" y="784" width="212" height="28" rx="4"/>
     <text x="590" y="803" text-anchor="middle">Regression testing</text>
   </svg>
   </figure>
